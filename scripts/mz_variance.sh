@@ -24,4 +24,4 @@ Rscript \
 	mz_variance.r \
 	${i} \
 	${splits} \
-	test${i}.rdata
+	../results/mz${i}.rdata
