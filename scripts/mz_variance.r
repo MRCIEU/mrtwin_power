@@ -49,8 +49,8 @@ out <- arguments[3]
 param <- expand.grid(
 	nsim = 1:100,
 	n = c(10000, 20000, 30000, 40000, 50000),
-	eff = seq(0.005, 0.07, by=0.005),
-	maf = c(0.05, 0.15, 0.5),
+	eff = seq(0, 0.02, by=0.001),
+	maf = c(0.05, 0.15, 0.5, 0.85, 0.95),
 	C = c(0.25, 0.5, 0.75),
 	h2 = 0.2,
 	model = 1:3
@@ -72,41 +72,37 @@ for(i in 1:nrow(param))
 		1 - param$h2[i], (1 - param$h2[i]) * param$C[i], (1 - param$h2[i]) * param$C[i], 1 - param$h2[i]), 2, 2
 	)
 	C <- rmvnorm(param$n[i], mean=c(0,0), sigma=sig)
+	g <- rbinom(param$n[i], 2, param$maf[i])
+	A <- rnorm(param$n[i], sd=sqrt(param$h2[i]))
 	if(param$model[i] == 1)
 	{
-		g <- rbinom(param$n[i], 2, param$maf[i])
-		pgs <- rnorm(param$n[i], sd=sqrt(0.2))
 		e1 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
 		e2 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		y1 <- pgs + e1 + C[,1]
-		y2 <- pgs + e2 + C[,2]
+		y1 <- A + e1 + C[,1]
+		y2 <- A + e2 + C[,2]
 	}
 	if(param$model[i] == 2)
 	{
-		g <- rbinom(param$n[i], 2, param$maf[i])
-		pgs <- rnorm(param$n[i], sd=sqrt(0.2))
-		# e1 <- rnorm(param$n[i], mean=0, sd=sqrt(0.8))
-		# e2 <- rnorm(param$n[i], mean=0, sd=sqrt(0.8))
-		y1 <- pgs + scale(g) * sqrt(param$eff[i]) + C[,1]
-		y2 <- pgs + scale(g) * sqrt(param$eff[i]) + C[,2]
+		y1 <- A + scale(g) * sqrt(param$eff[i]) + C[,1]
+		y2 <- A + scale(g) * sqrt(param$eff[i]) + C[,2]
 	}
 	if(param$model[i] == 3)
 	{
-		g <- rbinom(param$n[i], 2, param$maf[i])
-		pgs <- rnorm(param$n[i], sd=sqrt(0.2))
 		e1 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
 		e2 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		y1 <- pgs + scale(g) * sqrt(param$eff[i]) + e1 + C[,1]
-		y2 <- pgs + scale(g) * sqrt(param$eff[i]) + e2 + C[,2]
+		y1 <- A + scale(g) * sqrt(param$eff[i]) + e1 + C[,1]
+		y2 <- A + scale(g) * sqrt(param$eff[i]) + e2 + C[,2]
 	}
-	ydif <- (y1 - y2)^2
-	vdiff <- (tapply(y1, g, var) + tapply(y2, g, var)) / 2
-	mod <- summary(lm(ydif ~ g))
-	param$g1[i] <- vdiff[1]
-	param$g2[i] <- vdiff[2]
-	param$g3[i] <- vdiff[3]
-	param$pval[i] <- mod$coefficients[2,4]
-	param$b[i] <- mod$coefficients[2,1]
+	ydif1 <- (y1 - y2)^2
+	mod1 <- summary(lm(ydif1 ~ g))
+	param$pval1[i] <- mod1$coefficients[2,4]
+	param$b1[i] <- mod1$coefficients[2,1]
+	param$se1[i] <- mod1$coefficients[2,2]
+	ydif2 <- (y1 + y2)^2
+	mod2 <- summary(lm(ydif2 ~ g))
+	param$pval2[i] <- mod2$coefficients[2,4]
+	param$b2[i] <- mod2$coefficients[2,1]
+	param$se2[i] <- mod2$coefficients[2,2]
 }
 
 save(param, file=out)
