@@ -12,6 +12,7 @@ output:
 suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(tidyr))
 opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE)
 
 ```
@@ -95,22 +96,65 @@ $$
 ```{r }
 
 
+# bDS = 0.5[(1-w)bS - wbD]
+# w = (1 / var(bD)) / (1/var(bD) + 1/var(bS))
+# var(bDS) = 0.25w*var(bD)
+# T = bDS^2 / var(bDS)
+# here, bDS is an estimate of var(A) (not -0.5var(A))
+beta.sd <- function(bS, bD, seS, seD, n)
+{
+	vS <- seS^2
+	vD <- seD^2
+	w <- (1 / vD) / (1 / vD + 1 / vS)
+	bDS <- 0.5 * ((1 - w) * bS - w * bD)
+	vDS <- 0.25 * w * vD
+	tDS <- bDS / sqrt(vDS)
+	pDS <- pt(abs(tDS), df=n-1, lower.tail=FALSE) * 2
+	d <- data.frame(bDS = bDS, vDS = vDS, tDS = tDS, pDS = pDS)
+	return(d)
+}
+
+
 load("../results/mz.rdata")
 
+
+met <- beta.sd(dat$b1, dat$b2, dat$se1, dat$se2, dat$n)
+dim(met)
+head(met)
+
+dat$pval3 <- met$pDS
+dat$b3 <- met$bDS
+dat$se3 <- sqrt(met$vDS)
+
+
 pow <- group_by(dat, n, eff, maf, C, h2, model) %>%
-	dplyr::summarise(pow=sum(pval < 5e-8) / n())
+	dplyr::summarise(
+		pow1=sum(pval1 < 0.05) / n(), 
+		pow2=sum(pval2 < 0.05) / n(), 
+		pow3=sum(pval3 < 0.05) / n()
+	)
 
 pow$maflab <- paste0("MAF = ", pow$maf)
 pow$Clab <- paste0("C = ", pow$C)
 pow$Modellab <- paste0("Model = ", pow$model)
 
+pow <- gather(pow, key=method, value=pow, pow1, pow2, pow3)
+
+
+assoc <- group_by(dat, n, eff, maf, C, h2, model) %>%
+	dplyr::summarise(rel=cov(b1, b2)/var(b1))
+
+
+
+
+
 ```
 
 ```{r , fig.cap="Power estimates for Model 1 across a range of scenarios, where $\\alpha=5 \\times 10^{-8}$"}
 
-ggplot(subset(pow, model == 1), aes(y=pow, x=eff)) +
-geom_point(aes(colour=as.factor(n))) +
-geom_line(aes(colour=as.factor(n))) +
+ggplot(subset(pow, model == 1 & n == max(n)), aes(y=pow, x=eff)) +
+geom_point(aes(colour=as.factor(method))) +
+geom_line(aes(colour=as.factor(method))) +
 facet_grid(Clab ~ maflab) +
 labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Sample size") +
 scale_colour_brewer(type="qual")
