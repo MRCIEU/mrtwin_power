@@ -127,5 +127,5 @@ for(i in 1:nrow(param))
 }
 
 res <- bind_rows(res)
-save(param, file=out)
+save(res, file=out)
 

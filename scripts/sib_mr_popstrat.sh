@@ -18,7 +18,9 @@ if [ -n "${1}" ]; then
 fi
 
 i=${PBS_ARRAYID}
-splits=16
+splits=100
+
+cd ${HOME}/repo/mrtwin_power/scripts
 
 Rscript \
 	sib_mr_popstrat.r \

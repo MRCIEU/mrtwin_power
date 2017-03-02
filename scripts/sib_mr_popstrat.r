@@ -7,7 +7,7 @@
 source("sib_mr_functions.r")
 
 param <- expand.grid(
-	nsim = 1:20,
+	nsim = 1:100,
 	n = c(20000, 60000, 100000),
 	nsnp = 90,
 	vargx = 0.1,
@@ -36,7 +36,7 @@ dat1 <- make_families(runif(90), 50000)
 dat2 <- make_families(runif(90), 50000)
 
 res <- list()
-for(i in 1:3)
+for(i in 1:nrow(param))
 {
 	message(i)
 	n1 <- n2 <- param$n[i] / 2

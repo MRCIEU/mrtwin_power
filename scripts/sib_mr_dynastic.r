@@ -1,7 +1,7 @@
 source("sib_mr_functions.r")
 
 param <- expand.grid(
-	nsim = 1:20,
+	nsim = 1:100,
 	n = c(20000, 60000, 100000),
 	nsnp = 90,
 	vargx = 0.1,
