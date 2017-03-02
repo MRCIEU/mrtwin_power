@@ -127,46 +127,51 @@ dat$b3 <- met$bDS
 dat$se3 <- sqrt(met$vDS)
 
 
-pow <- group_by(dat, n, eff, maf, C, h2, model) %>%
+pow <- group_by(dat, n, eff, maf, C, A, model, test) %>%
 	dplyr::summarise(
-		pow1=sum(pval1 < 0.05) / n(), 
-		pow2=sum(pval2 < 0.05) / n(), 
-		pow3=sum(pval3 < 0.05) / n()
+		pow=sum(pval < 5e-8) / n(),
+		nsim=n()
 	)
 
 pow$maflab <- paste0("MAF = ", pow$maf)
 pow$Clab <- paste0("C = ", pow$C)
 pow$Modellab <- paste0("Model = ", pow$model)
 
-pow <- gather(pow, key=method, value=pow, pow1, pow2, pow3)
-
-
-assoc <- group_by(dat, n, eff, maf, C, h2, model) %>%
-	dplyr::summarise(rel=cov(b1, b2)/var(b1))
-
-
-
-
-
 ```
 
 ```{r , fig.cap="Power estimates for Model 1 across a range of scenarios, where $\\alpha=5 \\times 10^{-8}$"}
 
-ggplot(subset(pow, model == 1 & n == max(n)), aes(y=pow, x=eff)) +
-geom_point(aes(colour=as.factor(method))) +
-geom_line(aes(colour=as.factor(method))) +
-facet_grid(Clab ~ maflab) +
-labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Sample size") +
+ggplot(subset(pow, maf == 0.4 & n == max(n)), aes(y=pow, x=eff)) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(Clab ~ Modellab) +
+labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
 scale_colour_brewer(type="qual")
+
+
+ggplot(subset(pow, model == 2 & n == max(n)), aes(y=pow, x=eff)) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(Clab ~ Modellab) +
+labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
+scale_colour_brewer(type="qual")
+
+ggplot(subset(pow, model == 3 & n == max(n)), aes(y=pow, x=eff)) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(Clab ~ Modellab) +
+labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
+scale_colour_brewer(type="qual")
+
 
 ```
 
-```{r, fig.cap="Power estimates for all models for minor allele frequency = 0.5, where $\\alpha=5 \\times 10^{-8}$"}
+```{r, fig.cap="Power estimates for Model 1, where $\\alpha=5 \\times 10^{-8}$"}
 
-ggplot(subset(pow, maf==0.5), aes(y=pow, x=eff)) +
+ggplot(subset(pow, model == 1 & test == "D2"), aes(y=pow, x=eff)) +
 geom_point(aes(colour=as.factor(n))) +
 geom_line(aes(colour=as.factor(n))) +
-facet_grid(Clab ~ Modellab) +
+facet_grid(Clab ~ maflab) +
 labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Sample size") +
 scale_colour_brewer(type="qual")
 
