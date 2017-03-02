@@ -1,44 +1,88 @@
 library(dplyr)
 library(ggplot2)
-library(mvtnorm)
+
+fastAssoc <- function(y, x)
+{
+	index <- is.finite(y) & is.finite(x)
+	n <- sum(index)
+	y <- y[index]
+	x <- x[index]
+	vx <- var(x)
+	bhat <- cov(y, x) / vx
+	ahat <- mean(y) - bhat * mean(x)
+	# fitted <- ahat + x * bhat
+	# residuals <- y - fitted
+	# SSR <- sum((residuals - mean(residuals))^2)
+	# SSF <- sum((fitted - mean(fitted))^2)
+
+	rsq <- (bhat * vx)^2 / (vx * var(y))
+	fval <- rsq * (n-2) / (1-rsq)
+	tval <- sqrt(fval)
+	se <- abs(bhat / tval)
+
+	# Fval <- (SSF) / (SSR/(n-2))
+	# pval <- pf(Fval, 1, n-2, lowe=F)
+	p <- pf(fval, 1, n-2, lowe=F)
+	return(list(
+		ahat=ahat, bhat=bhat, se=se, fval=fval, pval=p, n=n
+	))
+}
 
 
-# n <- 1000000
+make_sibs <- function(n, maf, eff, vA, vC, model)
+{
+	g <- rbinom(n, 2, maf)
+	A <- rnorm(n, sd=sqrt(vA))
+	C <- rnorm(n, sd=sqrt(vC))
+	E1 <- rnorm(n, sd=sqrt(1 - vA - vC))
+	E2 <- rnorm(n, sd=sqrt(1 - vA - vC))
+	if(model == 1)
+	{
+		z1 <- rnorm(n, mean=0, sd=sqrt(eff * g))
+		z2 <- rnorm(n, mean=0, sd=sqrt(eff * g))
+		y1 <- scale(A + z1 + C + E1)
+		y2 <- scale(A + z2 + C + E2)
+	}
+	if(model == 2)
+	{
+		y1 <- scale(A + scale(g) * sqrt(eff) + C + E1)
+		y2 <- scale(A + scale(g) * sqrt(eff) + C + E2)
+	}
+	if(model == 3)
+	{
+		z1 <- rnorm(n, mean=0, sd=sqrt(eff * g))
+		z2 <- rnorm(n, mean=0, sd=sqrt(eff * g))
+		y1 <- scale(A + scale(g) * sqrt(eff) + z1 + C + E1)
+		y2 <- scale(A + scale(g) * sqrt(eff) + z2 + C + E2)
+	}
 
-# g <- rbinom(n, 2, 0.5)
-# pgs <- rnorm(n, sd=sqrt(0.2))
-
-# # rsq due to variance effect of SNP is 0.5%
-# b <- 0.005/2
-# e1 <- rnorm(n, mean=0, sd=sqrt(0.8 + b * g))
-# e2 <- rnorm(n, mean=0, sd=sqrt(0.8 + b * g))
-# tapply(e1, g, var)
-
-# c1 <- rmvnorm(n, mean=c(0,0), sigma=matrix(c((1-h2), ((1-h2)*r), ((1-h2)*r), ((1-h2))),2,2))
-
-
-# y1 <- pgs + e1
-# y2 <- pgs + e2
-
-# ydif <- (y1 - y2)^2
-# summary(lm(ydif ~ g))
+	dat <- data.frame(
+		y1 = y1,
+		y2 = y2,
+		A = A,
+		C = C,
+		g = g,
+		D2 = (y1 - y2)^2,
+		S2 = (y1 + y2)^2
+	)
+	return(dat)
+}
 
 
+do_test <- function(dat)
+{
+	res <- rbind(
+		as.data.frame(fastAssoc(dat$D2, dat$g)),
+		as.data.frame(fastAssoc(dat$S2, dat$g)),
+		as.data.frame(fastAssoc(dat$y1, dat$g)),
+		as.data.frame(fastAssoc(dat$y1^2, dat$g))
+	)
+	res$test <- c("D2", "S2", "y", "ysq")
+	return(res)
+}
 
-# To estimate statistical power, we need to simulate the phenotype as a function of SNPs and random noise. Then we see how often a significant association at some alpha level is found using the model for a specific set of parameters.
-# The models:
 
-# Model 1: The SNP influences the variance
-# y_i1 = g_i + e_i1 + c_i1
-# y_i2 = g_i + e_i2 + c_i2
-# g_i ~ N(0, h2)
-# e_i1 ~ e_i2 ~ N(0, b*x_i)
-# x_i ~ Binom(2, maf)
-# c_i ~ MVN(0, sigma)
-# sigma = [1-h2, C
-#             C, 1-h2]
-#
-# Basically what this means is that for a MZ pair, each individual has the same genetic risk score (g). This has variance of h2. They also have a common environmental effect and a specific environmental effect. This is shown by sigma - the variance of the environmental effect is 1 - h2, but MZ1 and MZ2 have correlated environments, denoted by C (i.e. a mixture of specific and common). Finally, the SNP influences an extra environmental component. 
+###
 
 
 arguments <- commandArgs(T)
@@ -49,10 +93,10 @@ out <- arguments[3]
 param <- expand.grid(
 	nsim = 1:100,
 	n = c(10000, 20000, 30000, 40000, 50000),
-	eff = seq(0, 0.02, by=0.001),
-	maf = c(0.05, 0.15, 0.5, 0.85, 0.95),
+	eff = seq(0, 0.035, by=0.001),
+	maf = c(0.05, 0.15, 0.4),
+	A = 0.2,
 	C = c(0.25, 0.5, 0.75),
-	h2 = 0.2,
 	model = 1:3
 )
 
@@ -65,52 +109,23 @@ message("running: ", t1, " to ", t2)
 
 param <- param[t1:t2, ]
 
+res <- list()
 for(i in 1:nrow(param))
 {
 	message(i, " of ", nrow(param))
-	sig <- matrix(c(
-		1 - param$h2[i], (1 - param$h2[i]) * param$C[i], (1 - param$h2[i]) * param$C[i], 1 - param$h2[i]), 2, 2
+	dat <- make_sibs(
+		param$n[i], 
+		param$maf[i], 
+		param$eff[i], 
+		param$A[i], 
+		param$C[i], 
+		param$model[i]
 	)
-	C <- rmvnorm(param$n[i], mean=c(0,0), sigma=sig)
-	g <- rbinom(param$n[i], 2, param$maf[i])
-	A <- rnorm(param$n[i], sd=sqrt(param$h2[i]))
-	if(param$model[i] == 1)
-	{
-		e1 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		e2 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		y1 <- A + e1 + C[,1]
-		y2 <- A + e2 + C[,2]
-	}
-	if(param$model[i] == 2)
-	{
-		y1 <- A + scale(g) * sqrt(param$eff[i]) + C[,1]
-		y2 <- A + scale(g) * sqrt(param$eff[i]) + C[,2]
-	}
-	if(param$model[i] == 3)
-	{
-		e1 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		e2 <- rnorm(param$n[i], mean=0, sd=sqrt(param$eff[i] * g))
-		y1 <- A + scale(g) * sqrt(param$eff[i]) + e1 + C[,1]
-		y2 <- A + scale(g) * sqrt(param$eff[i]) + e2 + C[,2]
-	}
-	ydif1 <- (y1 - y2)^2
-	mod1 <- summary(lm(ydif1 ~ g))
-	param$pval1[i] <- mod1$coefficients[2,4]
-	param$b1[i] <- mod1$coefficients[2,1]
-	param$se1[i] <- mod1$coefficients[2,2]
-	ydif2 <- (y1 + y2)^2
-	mod2 <- summary(lm(ydif2 ~ g))
-	param$pval2[i] <- mod2$coefficients[2,4]
-	param$b2[i] <- mod2$coefficients[2,1]
-	param$se2[i] <- mod2$coefficients[2,2]
+	right <- do_test(dat)
+	left <- param[rep(i, nrow(right)), ]
+	res[[i]] <- cbind(right, left)
 }
 
+res <- bind_rows(res)
 save(param, file=out)
 
-# a <- group_by(param, model, eff, maf, n, C) %>%
-# summarise(pow = sum(pval < 5e-8) / n())
-
-# ggplot(subset(a, maf==0.5), aes(x=eff, y=pow)) +
-# geom_point(aes(colour=as.factor(n))) +
-# geom_line(aes(colour=as.factor(n))) +
-# facet_grid(C ~ model)
