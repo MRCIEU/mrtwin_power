@@ -19,27 +19,26 @@ opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE)
 
 To estimate statistical power, we need to simulate the phenotype as a function of SNPs and random noise. Then we see how often a significant association at some alpha level is found using the model for a specific set of parameters.
 
+For reference, the FTO variant reported to have an influence on the variance of BMI (Yang et al 2012) had an effect of 0.035 and an allele frequency f 0.4. This effect estimate is of course not necessarily entirely a variance effect as the method to estimate variance was not orthogonal to the additive effect.
+
+
 ### Model 1: The SNP influences the variance
 
-Each individual has a phenotype $y$ that is a function of an additive genetic value $g$, a noise term $e$ whose magnitude is determined by the genotype at SNP $x$, and a residual variance $c$. The residual variance is estimated jointly for two individuals who compose an MZ pair $i$. They share some of the residual variance, and some of it is specific.
+Each individual has a phenotype $y$ that is a function of an additive genetic value $a$, a noise term $z$ whose magnitude is determined by the genotype at SNP $x$, a common environment effect $c$ and a residual variance $e$. The residual variance is specific to each individual $i1$ and $i2$.
 
-The $g$ is identical for each in a twin pair, and it is sampled with variance $h^2$, the heritability of the trait. The residual variance is sampled from a bivariate normal distribution, such that the variance is $1 - h^2$ and there is a correlation between the two individuals in a pair. Hence, each twin individual has a common and a specific environmental component. The extent to which this is divided is determined by $C$. e.g. The common environmental variance will be $C(1 - h^2)$ and the specific environmental variance will be $(1-C)(1-h^2)$.
+The $g$ is identical for each individual in a twin pair, and it is sampled with variance $h^2$, the heritability of the trait. This is also the case for the common environment effect, which is sampled with variance $s^2$. The residual variance is sampled from a normal distribution with variance $1 - h^2 - s^2$. Hence, each twin individual has a common and a specific environmental component.
 
 Finally, the SNP $x$ is in Hardy-Weinberg equilibrium with allele frequency $p$. It has a per allele effect on the variance of $b$.
 
 $$
 \begin{aligned}
-y_{i1} & = g_{i} + e_{i1} + c_{i1} \\
-y_{i2} & = g_{i} + e_{i2} + c_{i2} \\
-g_{i} & \sim N(0, h^2) \\
-e_{i1} & \sim N(0, bx_{i}) \\
-e_{i2} & \sim N(0, bx_{i}) \\
+y_{i1} & = a_{i} + z_{i1} + c_{i} + e_{i1} \\
+y_{i2} & = a_{i} + z_{i2} + c_{i} + e_{i2} \\
+a_{i} & \sim N(0, h^2) \\
+z_{i1} & \sim N(0, bx_{i}) \\
+z_{i2} & \sim N(0, bx_{i}) \\
 x_{i} & \sim Binom(2, p) \\
-c_{i} & \sim MVN(0, \sigma) \\
-\sigma & = \begin{bmatrix}
-1-h^2 & C\\ 
-C & 1-h^2
-\end{bmatrix}
+c_{i} & \sim N(0, s^2) \\
 \end{aligned}
 $$
 
@@ -50,15 +49,11 @@ This is identical to model 1 except for the following. The SNP no longer has an 
 
 $$
 \begin{aligned}
-y_{i1} & = g_{i} + bx_{i} + c_{i1} \\
-y_{i2} & = g_{i} + bx_{i} + c_{i2} \\
-g_{i} & \sim N(0, h^2) \\
+y_{i1} & = a_{i} + bx_{i} + c_{i} + e_{i1} \\
+y_{i2} & = a_{i} + bx_{i} + c_{i} + e_{i2} \\
+a_{i} & \sim N(0, h^2) \\
 x_{i} & \sim Binom(2, p) \\
-c_{i} & \sim MVN(0, \sigma) \\
-\sigma & = \begin{bmatrix}
-1-h^2 & C\\ 
-C & 1-h^2
-\end{bmatrix}
+c_{i} & \sim N(0, s^2) \\
 \end{aligned}
 $$
 
@@ -69,26 +64,62 @@ This is a combination of model 1 and model 2 - the SNP influences both the mean 
 
 $$
 \begin{aligned}
-y_{i1} & = g_{i} + bx_{i} + e_{i1} + c_{i1} \\
-y_{i2} & = g_{i} + bx_{i} + e_{i2} + c_{i2} \\
-g_{i} & \sim N(0, h^2) \\
-e_{i1} & \sim N(0, bx_{i}) \\
-e_{i2} & \sim N(0, bx_{i}) \\
+y_{i1} & = a_{i} + bx_{i} + z_{i1} + c_{i} + e_{i1} \\
+y_{i2} & = a_{i} + bx_{i} + z_{i2} + c_{i} + e_{i2} \\
+a_{i} & \sim N(0, h^2) \\
+z_{i1} & \sim N(0, bx_{i}) \\
+z_{i2} & \sim N(0, bx_{i}) \\
 x_{i} & \sim Binom(2, p) \\
-c_{i} & \sim MVN(0, \sigma) \\
-\sigma & = \begin{bmatrix}
-1-h^2 & C\\ 
-C & 1-h^2
-\end{bmatrix}
+c_{i} & \sim N(0, s^2) \\
 \end{aligned}
 $$
 
 
-### Results from power simulations
+## Tests
 
-1. It appears that the mean and variance influences of a SNP are completely unconfounded. Model 2 gives no indication of detecting associations when the SNP influences only the mean. Model 1 and Model 3 are identical.
-2. It is unlikely that SNP effect sizes on the variance exist at high magnitudes. It would be unlikely, for example, to find a SNP that influences 1% of the variance. There are relatively few scenarios where reasonable power would be achieved to detect an effect of that magnitude.
+In the following the phenotypes $y_1$ and $y_2$ are standardised to have mean 0 and variance 1.
 
+1. Influence of the SNP $x$ on the squared difference between individuals in a twin pair. e.g. For a twin pair $i$
+
+$$
+(y_{i1} - y_{i2})^2 = bx_i + e_i
+$$
+
+2. Influence of the SNP $x$ on the squared sum between individuals in a twin pair. e.g. For a twin pair $i$
+
+$$
+(y_{i1} + y_{i2})^2 = bx_i + e_i
+$$
+
+3. Influence of the SNP $x$ on the raw phenotype of one individual from each pair. e.g. For a twin pair $i$
+
+$$
+y_{i1} = bx_i + e_i
+$$
+
+4. The discovery model used in Yang et al - influence of the SNP on the square of the phenotype. e.g. For a twin pair $i$
+
+$$
+y_{i1}^2 = bx_i + e_i
+$$
+
+5. Combining (1) and (2) in a meta analysis, as these are in principal orthogonal.
+
+
+
+## Results from power simulations
+
+All simulations were performed for $h^2 = 0.2$.
+
+1. The $D^2$ test appears to be unconfounded, returning only the variance effect estimate uncontaminated by the mean. 
+2. The $S^2$ and $y^2$ methods both improve power slightly when there is a mean and a variance effect.
+3. The power of $D^2$ is much higher than $y^2$, though of course there are fewer readily available MZ twin pairs than unrelated samples.
+4. Higher $s^2$ (common environment) improves power to detect variance effect.
+5. More intermediate allele frequencies have higher power.
+6. There is sufficient power to detect much smaller effects on the variance than were discovered in Yang et al at sample sizes of e.g. 20k MZ twin pairs, which is probably a reasonable target.
+7. Winner's curse should help from doing multiple tests in GWAS.
+
+A potential strategy could be to use the $y^2$ approach as a discovery and then follow up with $D^2$ to obtain orthogonal estimates of variance effects.
 
 \newpage
 
@@ -118,14 +149,30 @@ beta.sd <- function(bS, bD, seS, seD, n)
 load("../results/mz.rdata")
 
 
-met <- beta.sd(dat$b1, dat$b2, dat$se1, dat$se2, dat$n)
-dim(met)
-head(met)
+# met <- beta.sd(dat$b1, dat$b2, dat$se1, dat$se2, dat$n)
+# dim(met)
+# head(met)
 
-dat$pval3 <- met$pDS
-dat$b3 <- met$bDS
-dat$se3 <- sqrt(met$vDS)
+# dat$pval3 <- met$pDS
+# dat$b3 <- met$bDS
+# dat$se3 <- sqrt(met$vDS)
 
+fishercombinedtest <- function(pval1, pval2)
+{
+	index <- pval1 == 0
+	pval1[index] <- 1e-50
+	index <- pval2 == 0
+	pval2[index] <- 1e-50
+	p <- pchisq(-2 * log(pval1) + log(pval2), df=4, low=FALSE)
+	return(p)
+}
+
+temp1 <- subset(dat, test == "D2")
+temp2 <- subset(dat, test == "S2")
+temp1$test <- "D2 + S2"
+temp1$pval <- fishercombinedtest(temp1$pval, temp2$pval)
+
+dat <- rbind(dat, temp1)
 
 pow <- group_by(dat, n, eff, maf, C, A, model, test) %>%
 	dplyr::summarise(
@@ -136,10 +183,20 @@ pow <- group_by(dat, n, eff, maf, C, A, model, test) %>%
 pow$maflab <- paste0("MAF = ", pow$maf)
 pow$Clab <- paste0("C = ", pow$C)
 pow$Modellab <- paste0("Model = ", pow$model)
+pow$Modellab <- as.factor(pow$Modellab)
+levels(pow$Modellab) <- c("1. Variance effect", "2. Additive effect", "3. 1 + 2")
+pow$test <- as.factor(pow$test)
+levels(pow$test) <- c(
+	expression((y[1] - y[2])^2),
+	expression((y[1] - y[2])^2 + (y[1] + y[2])^2),
+	expression((y[1] + y[2])^2),
+	expression(y[1]),
+	expression(y[1]^2)
+)
 
 ```
 
-```{r , fig.cap="Power estimates for Model 1 across a range of scenarios, where $\\alpha=5 \\times 10^{-8}$"}
+```{r , fig.cap="Power estimates for SNP MAF = 0.4 and 50000 MZs, across a range of scenarios and models, where $\\alpha=5 \\times 10^{-8}$"}
 
 ggplot(subset(pow, maf == 0.4 & n == max(n)), aes(y=pow, x=eff)) +
 geom_point(aes(colour=as.factor(test))) +
@@ -148,27 +205,11 @@ facet_grid(Clab ~ Modellab) +
 labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
 scale_colour_brewer(type="qual")
 
-
-ggplot(subset(pow, model == 2 & n == max(n)), aes(y=pow, x=eff)) +
-geom_point(aes(colour=as.factor(test))) +
-geom_line(aes(colour=as.factor(test))) +
-facet_grid(Clab ~ Modellab) +
-labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
-scale_colour_brewer(type="qual")
-
-ggplot(subset(pow, model == 3 & n == max(n)), aes(y=pow, x=eff)) +
-geom_point(aes(colour=as.factor(test))) +
-geom_line(aes(colour=as.factor(test))) +
-facet_grid(Clab ~ Modellab) +
-labs(x="Effect of SNP on variance", y="Power (alpha = 5e-8)", colour="Test") +
-scale_colour_brewer(type="qual")
-
-
 ```
 
-```{r, fig.cap="Power estimates for Model 1, where $\\alpha=5 \\times 10^{-8}$"}
+```{r, fig.cap="Power estimates for Model 1 using the $D^2$ method, where $\\alpha=5 \\times 10^{-8}$"}
 
-ggplot(subset(pow, model == 1 & test == "D2"), aes(y=pow, x=eff)) +
+ggplot(subset(pow, model == 1 & test == test[1]), aes(y=pow, x=eff)) +
 geom_point(aes(colour=as.factor(n))) +
 geom_line(aes(colour=as.factor(n))) +
 facet_grid(Clab ~ maflab) +
