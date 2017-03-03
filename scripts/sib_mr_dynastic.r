@@ -40,7 +40,7 @@ param <- param[t1:t2, ]
 dat <- make_families(runif(90), 100000)
 
 res <- list()
-for(i in 1:nrow(param))
+for(i in 1:3)
 {
 	message(i)
 	d <- sample_populations(dat, param$n[i])
@@ -51,13 +51,13 @@ for(i in 1:nrow(param))
 		sqrt(param$eff_ux[i]),
 		sqrt(param$eff_xu[i])
 	)
-	right <- as.data.frame(rbind(
-		do_mr_standard(p$sibs1$x, p$sibs1$y, d$sibs1),
-		do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d$ibd),
-		do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d$ibd),
-		do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d$ibd),
-		do_mr_pop_wf(d, p)
-	))
+	right <- rbind(
+		as.data.frame(do_mr_standard(p$sibs1$x, p$sibs1$y, d$sibs1)),
+		as.data.frame(do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d$ibd)),
+		as.data.frame(do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d$ibd)),
+		as.data.frame(do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d$ibd)),
+		as.data.frame(do_mr_pop_wf(d, p))
+	)
 	right$test <- 1:nrow(right)
 	right$model <- "dynastic"
 	left <- param[rep(i, nrow(right)), ]
@@ -66,3 +66,4 @@ for(i in 1:nrow(param))
 
 res <- bind_rows(res)
 save(res, file=out)
+
