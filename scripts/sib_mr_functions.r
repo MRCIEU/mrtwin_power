@@ -134,8 +134,11 @@ dynastic_phen <- function(fam, eff_gx, eff_xy, eff_ux, eff_uy, eff_xu)
 	n <- nrow(fam$sibs1)
 	
 	# parents x
-	xmums <- makePhen(eff_gx, fam$mums)
-	xdads <- makePhen(eff_gx, fam$dads)
+
+	umums <- rnorm(n)
+	udads <- rnorm(n)
+	xmums <- makePhen(c(eff_gx, eff_ux), cbind(fam$mums, umums))
+	xdads <- makePhen(c(eff_gx, eff_ux), cbind(fam$dads, udads))
 
 	u <- makePhen(c(eff_xu, eff_xu), cbind(xmums, xdads))
 	x1 <- makePhen(c(eff_gx, eff_ux), cbind(fam$sibs1, u))

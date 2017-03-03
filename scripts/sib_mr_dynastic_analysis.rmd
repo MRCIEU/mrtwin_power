@@ -17,26 +17,114 @@ opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE)
 
 ```
 
+
+## Simulation of genotypes
+
+Create $n$ mothers and fathers. They are unrelated. Each mother-father pair has 2 children. All individuals have genomes of 90 SNPs. Calculate IBD at each locus for each sibling pair. The distribution of IBD across the 90 SNPs is $N(\mu = 0.5, \sigma=0.037)$, as per theory, because there are on average 90 recombination events separating siblings. Hence, we are assuming each SNP has an effect and that all effects are independent.
+
+## Dynastic effects on phenotype
+
+Parents have confounders $u$, exposure $x$ and outcome $y$ phenotypes. The confounder influences $x$ and $y$ by some effect $\beta_{ux}, \beta_{uy}$, and $x$ influences $y$ with $\beta_{xy}$.
+
+The children have the same setup, except the parent's $x$ values influence the children's $u$ values also, with effect $\beta_{xu}$. This represents the dynastic effect.
+
+The genetic influence of each of the 90 SNPs on $x$ amounts to explaining $V_{gx}$ of the variance in $x$. There is no pleiotropy.
+
+
+## Statistical models
+
+### Standard MR
+
+Use just one sibling from each family and perform MR as usual using IVW. This involves obtaining the SNP-exposure association for each of the 90 SNPs; the SNP-outcome association for each of the 90 SNPs, and estimating the slope underlying the relationship using inverse squared standard errors for weights.
+
+### Within-family $D^2$
+
+The SNP-exposure estimates are performed within family. e.g. For SNP j
+
+$$
+(x_{i1} - x_{i2})^2 = \beta_{xj} \hat{\pi}_{ij} + e_{ij}
+$$
+
+and similarly the SNP-outcome estimates are obtained as
+
+$$
+(y_{i1} - y_{i2})^2 = \beta_{yj} \hat{\pi}_{ij} + e_{ij}
+$$
+
+The $\beta_{xj}$ and $\beta_{yj}$ estimates are then used in a standard IVW framework to obtain the causal effect.
+
+### Within-family $S^2$
+
+Identical to the $D^2$ except the LHS of the equation is replaced with $(y_{i1} + y_{i2})^2$.
+
+
+### Within-family $D^2 + S^2$
+
+Following from Visscher and Hopper 2001 this approximates the maximum likelihood estimate of the within-family linkage analysis by meta-analysing the $D^2$ and $S^2$ results of each SNP-exposure and SNP-outcome estimate. The results are subsequently used to estimate the causal effect in the standard IVW framework.
+
+$$
+\begin{aligned}
+w &= \frac{\frac{1}{v_D}}{\frac{1}{v_D} + \frac{1}{v_S}} \\
+b_{DS} &= \frac{1}{2}((1 - w) b_S - w b_D) \\
+v_{DS} &= \frac{1}{4} w v_D
+\end{aligned}
+$$
+
+### Hybrid
+
+Here the effect estimates for the SNP-exposure association are obtained externally (e.g. from a GWAS). In the case of the simulations, they are obtained from estimating $x = \beta_{xj} g + e$ using the fathers' simulated data. A weighted genetic difference between siblings is then obtained:
+
+$$
+\delta_{x_g,j} = \hat{\beta}_xj g_{i_1, j} - \hat{\beta}_xj g_{i_2, j}
+$$
+
+The SNP's influence on the relationship between sibling genotypic difference and exposure difference is then obtained by regression:
+
+$$
+(x_{i1} - x_{i2})^2 = \beta_{xj} \delta_{x_g,j} + e_{ij}
+$$
+
+and similarly for the outcome
+
+$$
+(y_{i1} - y_{i2})^2 = \beta_{yj} \delta_{x_g,j} + e_{ij}
+$$
+
+The $\hat{\beta}_{yj}$ and $\hat{\beta}_{xj}$ estimates are then used in a standard IVW framework.
+
+
+## Results
+
+All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. somewhat similar to BMI with latest GIANT results).
+
+1. The standard MR estimate has high power for detecting association, but when confounding and dynastic effects are large there is a an extremely high false discovery rate
+2. The within-family methods have extremely low power
+3. The hybrid approach appears to be well powered and with low FDR for the null model with dynastic effects.
+
 ```{r }
 
 load("../results/sib_dynastic.rdata")
 
+dat$b <- unlist(dat$b)
+dat$se <- unlist(dat$se)
+dat$pval <- unlist(dat$pval)
+
 pow <- group_by(dat, n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
-	dplyr::summarise(pow=sum(pval < 0.05)/n(), nsim=n())
+	dplyr::summarise(
+		se=sd(b, na.rm=TRUE),
+		b=mean(b, na.rm=TRUE),
+		pow=sum(pval < 0.05)/n(),
+		nsim=n()
+	)
 
 pow$test <- as.factor(pow$test)
-levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Pop + WF")
+levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
 
 pow$eff_ux <- paste0("Confounder = ", pow$eff_ux)
 pow$eff_xu <- paste0("Dynastic = ", pow$eff_xu)
+```
 
-
-ggplot(pow, aes(x=eff_xy, y=pow)) +
-geom_point(aes(colour=as.factor(test))) +
-geom_line(aes(colour=as.factor(test))) +
-facet_grid(eff_xu ~ eff_ux) +
-scale_colour_brewer(type="qual")
-
+```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
 
 ggplot(subset(pow, eff_xy == 0), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
@@ -45,6 +133,9 @@ facet_grid(eff_xu ~ eff_ux) +
 scale_colour_brewer(type="qual") +
 labs(x="Sample size", y="Power (proportion of tests with p < 0.05 out of 100)", colour="Method")
 
+```
+
+```{r fig.cap="Non-null models where confounders are fixed at 0.1. Standard model has highest power, but hybrid model also performs well. Within-family models are substantially less powerful." }
 
 ggplot(subset(pow, eff_ux=="Confounder = 0.1" & eff_xy != 0), aes(x=as.factor(eff_xy), y=pow, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
@@ -55,3 +146,21 @@ labs(x="Effect size (causal variance explained)", y="Power (proportion of tests 
 
 
 ```
+
+```{r fig.cap="Bias in effect size estimates for different methods. No bias in within family methods, but a lot in MR estimates when confounding and dynastic effects. Hybrid method appears to be unbiased but on the wrong scale."}
+
+dat$test <- as.factor(dat$test)
+levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
+
+dat$eff_ux <- paste0("Confounder = ", dat$eff_ux)
+dat$eff_xu <- paste0("Dynastic = ", dat$eff_xu)
+
+
+ggplot(subset(dat), aes(x=as.factor(eff_xy), y=b-eff_xy)) +
+geom_boxplot(aes(fill=as.factor(test)), position="dodge") +
+facet_grid(eff_xu ~ eff_ux) +
+scale_fill_brewer(type="qual") +
+labs(y="Estimated effect - simulated effect", x = "Simulated effect of x on y", fill="Method")
+
+```
+
