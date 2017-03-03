@@ -43,7 +43,6 @@ res <- list()
 for(i in 1:nrow(param))
 {
 	message(i)
-	print(param$n[i])
 	d <- sample_populations(dat, param$n[i])
 	eff <- chooseEffects(param$nsnp[i], param$vargx[i])
 	p <- dynastic_phen(d, eff, 
@@ -59,7 +58,6 @@ for(i in 1:nrow(param))
 		do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d$ibd),
 		do_mr_pop_wf(d, p)
 	))
-	print(right$pval)
 	right$test <- 1:nrow(right)
 	right$model <- "dynastic"
 	left <- param[rep(i, nrow(right)), ]
