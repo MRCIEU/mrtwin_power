@@ -32,3 +32,30 @@ Y2 <- scale(q2 + F + rnorm(n, sd=r))
 s2 <- (Y1 + Y2)^2
 d2 <- (Y1 - Y2)^2
 
+
+
+
+
+source("sib_mr_functions.r")
+
+dat <- make_families(runif(90), 100000)
+
+fam <- sample_populations(dat, 50000)
+eff <- chooseEffects(90, 0.1)
+phen <- dynastic_phen(fam, eff, 
+	sqrt(0), 
+	sqrt(0),
+	sqrt(0),
+	sqrt(0)
+)
+
+do_mr_pop_wf(fam, phen)$b^2
+
+
+
+
+do_mr_pop_wf2(d, p)
+
+
+
+
