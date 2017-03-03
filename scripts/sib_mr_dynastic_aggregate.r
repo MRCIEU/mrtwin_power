@@ -4,7 +4,7 @@ for(i in 1:100)
 	if(file.exists(paste0("../results/sib_dynastic_", i, ".rdata")))
 	{
 		load(paste0("../results/sib_dynastic_", i, ".rdata"))
-		l[[i]] <- param
+		l[[i]] <- res
 	}
 	else { message(i)}
 }

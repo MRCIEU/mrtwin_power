@@ -40,7 +40,7 @@ param <- param[t1:t2, ]
 dat <- make_families(runif(90), 100000)
 
 res <- list()
-for(i in 1:3)
+for(i in 1:nrow(param))
 {
 	message(i)
 	d <- sample_populations(dat, param$n[i])
