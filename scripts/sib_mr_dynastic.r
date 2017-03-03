@@ -1,16 +1,14 @@
 source("sib_mr_functions.r")
 
 param <- expand.grid(
+	n = c(10000, 20000, 40000, 60000, 100000),
 	nsim = 1:100,
-	n = c(20000, 60000, 100000),
 	nsnp = 90,
-	vargx = 0.1,
-	eff_xy = c(0, 0.005, 0.01, 0.05, 0.1),
-	eff_ux = c(0, 0.1, 0.4),
-	eff_xu = c(0, 0.1, 0.4)
+	vargx = c(0.05, 0.1),
+	eff_xy = c(0.001, 0.002, 0.005, 0.01, 0.05),
+	eff_ux = c(0, 0.1, 0.2),
+	eff_xu = c(0, 0.1, 0.2)
 )
-param$sim <- 1:nrow(param)
-
 
 arguments <- commandArgs(T)
 jid <- as.numeric(arguments[1])
@@ -45,6 +43,7 @@ res <- list()
 for(i in 1:nrow(param))
 {
 	message(i)
+	print(param$n[i])
 	d <- sample_populations(dat, param$n[i])
 	eff <- chooseEffects(param$nsnp[i], param$vargx[i])
 	p <- dynastic_phen(d, eff, 
@@ -53,21 +52,19 @@ for(i in 1:nrow(param))
 		sqrt(param$eff_ux[i]),
 		sqrt(param$eff_xu[i])
 	)
-	res[[i]] <- rbind(
+	right <- as.data.frame(rbind(
 		do_mr_standard(p$sibs1$x, p$sibs1$y, d$sibs1),
 		do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d$ibd),
 		do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d$ibd),
 		do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d$ibd),
 		do_mr_pop_wf(d, p)
-	)
-	res[[i]] <- as.data.frame(res[[i]])
-	res[[i]]$sim <- param$sim[i]
-	res[[i]]$model <- "dynastic"
-	res[[i]]$test <- 1:nrow(res[[i]])
+	))
+	print(right$pval)
+	right$test <- 1:nrow(right)
+	right$model <- "dynastic"
+	left <- param[rep(i, nrow(right)), ]
+	res[[i]] <- cbind(left, right)
 }
 
 res <- bind_rows(res)
-param <- merge(param, res, by="sim")
-save(param, file=out)
-
-
+save(res, file=out)

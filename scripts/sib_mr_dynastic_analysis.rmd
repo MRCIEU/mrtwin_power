@@ -1,0 +1,57 @@
+---
+title: Power of MR in within-family analysis
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+    keep_tex: true
+---
+
+
+```{r, echo=FALSE, cache=FALSE, warning=FALSE}
+
+suppressPackageStartupMessages(library(knitr))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(tidyr))
+opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE)
+
+```
+
+```{r }
+
+load("../results/sib_dynastic.rdata")
+
+pow <- group_by(dat, n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
+	dplyr::summarise(pow=sum(pval < 0.05)/n(), nsim=n())
+
+pow$test <- as.factor(pow$test)
+levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Pop + WF")
+
+pow$eff_ux <- paste0("Confounder = ", pow$eff_ux)
+pow$eff_xu <- paste0("Dynastic = ", pow$eff_xu)
+
+
+ggplot(pow, aes(x=eff_xy, y=pow)) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ eff_ux) +
+scale_colour_brewer(type="qual")
+
+
+ggplot(subset(pow, eff_xy == 0), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ eff_ux) +
+scale_colour_brewer(type="qual") +
+labs(x="Sample size", y="Power (proportion of tests with p < 0.05 out of 100)", colour="Method")
+
+
+ggplot(subset(pow, eff_ux=="Confounder = 0.1" & eff_xy != 0), aes(x=as.factor(eff_xy), y=pow, group=as.factor(test))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ n) +
+scale_colour_brewer(type="qual") +
+labs(x="Effect size (causal variance explained)", y="Power (proportion of tests with p < 0.05 out of 100)", colour="Method")
+
+
+```

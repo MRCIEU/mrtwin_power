@@ -10,13 +10,12 @@ library(dplyr)
 
 make_families <- function(af, nfam)
 {
-
 	nsnp <- length(af)
-	dads <- list()
-	mums <- list()
-	sibs1 <- list()
-	sibs2 <- list()
-	ibd <- list()
+	dads <- matrix(0, nfam, nsnp)
+	mums <- matrix(0, nfam, nsnp)
+	sibs1 <- matrix(0, nfam, nsnp)
+	sibs2 <- matrix(0, nfam, nsnp)
+	ibd <- matrix(0, nfam, nsnp)
 	for(i in 1:nsnp)
 	{
 		dad1 <- rbinom(nfam, 1, af[i]) + 1
@@ -48,23 +47,17 @@ make_families <- function(af, nfam)
 
 		sib2 <- cbind(dadh, mumh)
 
-		ibd[[i]] <- (as.numeric(sib1[,1] == sib2[,1]) + as.numeric(sib1[,2] == sib2[,2])) / 2
+		ibd[,i] <- (as.numeric(sib1[,1] == sib2[,1]) + as.numeric(sib1[,2] == sib2[,2])) / 2
 
 
-		sibs1[[i]] <- rowSums(abs(sib1) - 1)
-		sibs2[[i]] <- rowSums(abs(sib2) - 1)
-		dads[[i]] <- dad1 - 1 + abs(dad2) - 1
-		mums[[i]] <- mum1 - 1 + abs(mum2) - 1
+		sibs1[,i] <- rowSums(abs(sib1) - 1)
+		sibs2[,i] <- rowSums(abs(sib2) - 1)
+		dads[,i] <- dad1 - 1 + abs(dad2) - 1
+		mums[,i] <- mum1 - 1 + abs(mum2) - 1
 
 		# l[[i]] <- (sum(sib1[,1] == sib2[,1]) / nsnp + sum(sib1[,2] == sib2[,2]) / nsnp) / 2
 
 	}
-
-	sibs1 <- do.call(cbind, sibs1)
-	sibs2 <- do.call(cbind, sibs2)
-	dads <- do.call(cbind, dads)
-	mums <- do.call(cbind, mums)
-	ibd <- do.call(cbind, ibd)
 
 	# This may not be correct - getting some really large values
 	ibs <- scale(sibs1) * scale(sibs2)
@@ -267,13 +260,14 @@ do_mr_pop_wf <- function(fam, phen)
 	{
 		sdiffgx <- fam$sibs1[,i] * bx[i] - fam$sibs2[,i] * bx[i]
 		sdiffx <- phen$sibs1$x - phen$sibs2$x
-		mod <- summary(lm(sdiffx ~ sdiffgx))
-		sbx[i] <- mod$coef[2,1]
-		ssex[i] <- mod$coef[2,2]
+		# mod <- summary(lm(sdiffx ~ sdiffgx))
+		mod <- fastAssoc(sdiffx, sdiffgx)
+		sbx[i] <- mod$bhat
+		ssex[i] <- mod$se
 		sdiffy <- phen$sibs1$y - phen$sibs2$y
-		mod <- summary(lm(sdiffy ~ sdiffgx))
-		sby[i] <- mod$coef[2,1]
-		ssey[i] <- mod$coef[2,2]
+		mod <- fastAssoc(sdiffy, sdiffgx)
+		sby[i] <- mod$bhat
+		ssey[i] <- mod$se
 	}
 	return(mr_ivw(sbx, sby, ssex, ssey))
 }
