@@ -128,6 +128,10 @@ levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid
 pow$eff_ux <- paste0("Confounder = ", pow$eff_ux)
 pow$eff_xu <- paste0("Dynastic = ", pow$eff_xu)
 
+pow2 <- subset(pow, test %in% c("Standard MR", "Hybrid"))
+pow2$test <- as.factor(as.character(pow2$test))
+levels(pow2$test) <- c("Within-family MR", "Standard MR")
+
 ```
 
 ```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
@@ -170,6 +174,58 @@ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 # labs(y="Bias (Estimated effect - simulated effect)", x = "Simulated effect of x on y", fill="Method")
 
 ggplot(subset(pow, n == 100000 & vargx == 0.1), aes(x=(eff_xy), y=b - eff_xy, group=as.factor(test))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ eff_ux) +
+scale_colour_brewer(type="qual") +
+labs(y="Bias (estimated effect - simulated effect)", x = "Simulated effect of x on y", colour="Method") +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+
+```
+
+Plotting again with only hybrid and standard for purpose of cleaner presentations
+
+
+```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
+
+ggplot(subset(pow2, eff_xy == 0 & vargx == 0.1), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ eff_ux) +
+scale_colour_brewer(type="qual") +
+labs(x="Sample size", y="FDR (proportion of tests out of 100 with p < 0.05)", colour="Method") +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+
+```
+
+```{r fig.cap="Non-null models where confounders are fixed at 0.1. Standard model has highest power, but hybrid model also performs well. Within-family models are substantially less powerful." }
+
+ggplot(subset(pow2, eff_ux=="Confounder = 0.1" & eff_xy != 0 & vargx == 0.05), aes(x=as.factor(eff_xy), y=pow, group=as.factor(test))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(eff_xu ~ n) +
+scale_colour_brewer(type="qual") +
+labs(x="Effect size (causal variance explained)", y="Power (proportion of tests with p < 0.05 out of 100)", colour="Method") +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+
+
+```
+
+```{r fig.cap="Bias in effect size estimates for different methods. No bias in within family or hybrid methods, but a lot in MR estimates when confounding and dynastic effects are non zero."}
+
+# dat$test <- as.factor(dat$test)
+# levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
+
+# dat$eff_ux <- paste0("Confounder = ", dat$eff_ux)
+# dat$eff_xu <- paste0("Dynastic = ", dat$eff_xu)
+
+# ggplot(subset(dat), aes(x=as.factor(eff_xy), y=b)) +
+# geom_boxplot(aes(fill=as.factor(test)), position="dodge") +
+# facet_grid(eff_xu ~ eff_ux) +
+# scale_fill_brewer(type="qual") +
+# labs(y="Bias (Estimated effect - simulated effect)", x = "Simulated effect of x on y", fill="Method")
+
+ggplot(subset(pow2, n == 100000 & vargx == 0.1), aes(x=(eff_xy), y=b - eff_xy, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(eff_xu ~ eff_ux) +
