@@ -4,11 +4,13 @@ param <- expand.grid(
 	n = c(10000, 20000, 40000, 60000, 100000),
 	nsim = 1:100,
 	nsnp = 90,
+	gen = c("ibd", "ibs", "ibs_unw"),
 	vargx = c(0.05, 0.1),
 	eff_xy = c(0, 0.001, 0.002, 0.005, 0.01, 0.05),
 	eff_ux = c(0, 0.1, 0.2),
 	eff_xu = c(0, 0.1, 0.2)
 )
+param$gen <- as.character(param$gen)
 
 arguments <- commandArgs(T)
 jid <- as.numeric(arguments[1])
@@ -53,10 +55,11 @@ for(i in 1:nrow(param))
 	)
 	right <- rbind(
 		as.data.frame(do_mr_standard(p$sibs1$x, p$sibs1$y, d$sibs1)),
-		as.data.frame(do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d$ibd)),
-		as.data.frame(do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d$ibd)),
-		as.data.frame(do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d$ibd)),
-		as.data.frame(do_mr_pop_wf(d, p))
+		as.data.frame(do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d[[param$gen[i]]])),
+		as.data.frame(do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d[[param$gen[i]]])),
+		as.data.frame(do_mr_wf(p$sibs1$x, p$sibs2$x, p$sibs1$y, p$sibs2$y, d[[param$gen[i]]])),
+		as.data.frame(do_mr_pop_wf(d, p)),
+		as.data.frame(do_mr_trio(d, p))
 	)
 	right$test <- 1:nrow(right)
 	right$model <- "dynastic"

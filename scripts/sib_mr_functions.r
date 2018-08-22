@@ -16,6 +16,7 @@ make_families <- function(af, nfam)
 	sibs1 <- matrix(0, nfam, nsnp)
 	sibs2 <- matrix(0, nfam, nsnp)
 	ibd <- matrix(0, nfam, nsnp)
+	ibs <- matrix(0, nfam, nsnp)
 	for(i in 1:nsnp)
 	{
 		dad1 <- rbinom(nfam, 1, af[i]) + 1
@@ -61,8 +62,12 @@ make_families <- function(af, nfam)
 
 	# This may not be correct - getting some really large values
 	ibs <- scale(sibs1) * scale(sibs2)
-	return(list(dads=dads, mums=mums, sibs1=sibs1, sibs2=sibs2, ibd=ibd, ibs=ibs))
+
+	# Just count how many alleles are in common
+	ibs_unw <- abs(abs(sibs1 - sibs2) - 2) / 2
+	return(list(dads=dads, mums=mums, sibs1=sibs1, sibs2=sibs2, ibd=ibd, ibs=ibs, ibs_unw=ibs_unw))
 }
+
 
 
 makePhen <- function(effs, indep, vy=1, vx=rep(1, length(effs)), my=0)
@@ -273,4 +278,28 @@ do_mr_pop_wf <- function(fam, phen)
 		ssey[i] <- mod$se
 	}
 	return(mr_ivw(sbx, sby, ssex, ssey))
+}
+
+
+do_mr_trio <- function(fam, phen)
+{
+	nsnp <- ncol(fam$dads)
+	bx <- rep(NA, nsnp)
+	by <- rep(NA, nsnp)
+	sex <- rep(NA, nsnp)
+	sey <- rep(NA, nsnp)
+	for(i in 1:nsnp)
+	{
+		sdiffgx <- fam$sibs1[,i] * bx[i] - fam$sibs2[,i] * bx[i]
+		sdiffx <- phen$sibs1$x - phen$sibs2$x
+		# mod <- summary(lm(sdiffx ~ sdiffgx))
+
+		mod <- summary(lm(phen$sibs1$x ~ fam$sibs1[,i] + fam$dads[,i] + fam$mums[,i]))$coefficients
+		bx[i] <- mod[2,1]
+		sex[i] <- mod[2,2]
+		mod <- summary(lm(phen$sibs1$y ~ fam$sibs1[,i] + fam$dads[,i] + fam$mums[,i]))$coefficients
+		by[i] <- mod[2,1]
+		sey[i] <- mod[2,2]
+	}
+	return(mr_ivw(bx, by, sex, sey))
 }
