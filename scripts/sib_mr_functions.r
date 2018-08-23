@@ -128,6 +128,7 @@ sample_populations <- function(l, n)
 	l$sibs2 <- l$sibs2[index,]
 	l$ibd <- l$ibd[index,]
 	l$ibs <- l$ibs[index,]
+	l$ibs_unw <- l$ibs_unw[index,]
 	return(l)
 }
 
