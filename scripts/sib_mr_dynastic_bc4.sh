@@ -5,9 +5,10 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --array=1-200
+#SBATCH --array=201-300
 #SBATCH --output=job_reports/slurm-%A_%a.out
 #SBATCH --partition=mrcieu
+#SBATCH --mem=4G
 
 echo "Running on ${HOSTNAME}"
 module add R/3.2.3-foss-2016a
@@ -19,7 +20,7 @@ fi
 
 i=${SLURM_ARRAY_TASK_ID}
 
-splits=200
+splits=300
 set -e
 
 mkdir -p ../results/sib_dynastic/
