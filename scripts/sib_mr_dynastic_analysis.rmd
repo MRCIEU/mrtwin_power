@@ -101,9 +101,11 @@ The $\hat{\beta}_{yj}$ and $\hat{\beta}_{xj}$ estimates are then used in a stand
 
 All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. somewhat similar to BMI with latest GIANT results).
 
-1. The standard MR estimate has high power for detecting association, but when confounding and dynastic effects are large there is a an extremely high false discovery rate
+1. The standard MR estimate has high power for detecting association, but when confounding and dynastic effects are large there is an extremely high false discovery rate
 2. The within-family methods have extremely low power
 3. The hybrid approach appears to be well powered and with low FDR for the null model with dynastic effects. Also shows little bias in these simulations.
+4. Trio method is comparable to hybrid, with slightly better power when sample sizes are smaller
+5. The use of IBD, IBS and unweighted IBS are largely identical
 
 
 ```{r }
@@ -111,10 +113,26 @@ All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. s
 load("../results/sib_dynastic.rdata")
 
 dat$test <- as.factor(dat$test)
-levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
-dat$b[dat$test %in% c("Hybrid", "Standard MR")] <- dat$b[dat$test %in% c("Hybrid", "Standard MR")]^2
+levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid", "Trios")
+dat$b[dat$test %in% c("Hybrid", "Standard MR", "Trios")] <- dat$b[dat$test %in% c("Hybrid", "Standard MR", "Trios")]^2
+dat$se[dat$test %in% c("Hybrid", "Standard MR", "Trios")] <- dat$se[dat$test %in% c("Hybrid", "Standard MR", "Trios")]^2
 
-pow <- group_by(dat, n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
+```
+
+Is there a difference in method performance based on whether IBD, IBS or unweighted IBS is used?
+
+```{r}
+# IBD, IBS, IBS_unw
+dat$sig <- dat$pval < 0.05
+group_by(dat, test, eff_xy == 0) %>% summarise(
+	sig = summary(lm(sig ~ gen))$coef[2,4]
+) %>% kable
+
+```
+
+```{r}
+
+pow <- filter(dat) %>% group_by(n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
 	dplyr::summarise(
 		se=sd(b, na.rm=TRUE),
 		b=mean(b, na.rm=TRUE),
@@ -122,21 +140,22 @@ pow <- group_by(dat, n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
 		nsim=n()
 	)
 
-pow$test <- as.factor(pow$test)
-levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
+
+# pow$test <- as.factor(pow$test)
+# levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid", "Trios")
 
 pow$eff_ux <- paste0("Confounder = ", pow$eff_ux)
 pow$eff_xu <- paste0("Dynastic = ", pow$eff_xu)
 
-pow2 <- subset(pow, test %in% c("Standard MR", "Hybrid"))
+pow2 <- subset(pow, test %in% c("Standard MR", "Hybrid", "Trios"))
 pow2$test <- as.factor(as.character(pow2$test))
-levels(pow2$test) <- c("Within-family MR", "Standard MR")
+levels(pow2$test) <- c("Sibling MR", "Standard MR", "Trio MR")
 
 ```
 
 ```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
 
-ggplot(subset(pow, eff_xy == 0 & vargx == 0.1), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
+ggplot(subset(pow, eff_xy == 0 & vargx == 0.1 & test != "Standard MR"), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(eff_xu ~ eff_ux) +
@@ -183,7 +202,7 @@ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 
 ```
 
-Plotting again with only hybrid and standard for purpose of cleaner presentations
+Plotting again with only hybrid, trio and standard for purpose of cleaner presentations
 
 
 ```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
