@@ -282,6 +282,35 @@ do_mr_pop_wf <- function(fam, phen)
 }
 
 
+do_mr_wf <- function(fam, phen, method="diff")
+{
+	# bx <- gwas(phen$dads$x, fam$dads)$bhat
+	nsnp <- ncol(fam$dads)
+	sbx <- rep(NA, nsnp)
+	sby <- rep(NA, nsnp)
+	ssex <- rep(NA, nsnp)
+	ssey <- rep(NA, nsnp)
+	for(i in 1:nsnp)
+	{
+		if(method == "diff")
+		{
+			sdiffgx <- fam$sibs1[,i] - fam$sibs2[,i]
+		} else {
+			sdiffgx <- fam[[meth]][,i]
+		}
+		sdiffx <- phen$sibs1$x - phen$sibs2$x
+		# mod <- summary(lm(sdiffx ~ sdiffgx))
+		mod <- fastAssoc(sdiffx, sdiffgx)
+		sbx[i] <- mod$bhat
+		ssex[i] <- mod$se
+		sdiffy <- phen$sibs1$y - phen$sibs2$y
+		mod <- fastAssoc(sdiffy, sdiffgx)
+		sby[i] <- mod$bhat
+		ssey[i] <- mod$se
+	}
+	return(mr_ivw(sbx, sby, ssex, ssey))
+}
+
 do_mr_trio <- function(fam, phen)
 {
 	nsnp <- ncol(fam$dads)

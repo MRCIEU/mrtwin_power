@@ -2,8 +2,7 @@
 title: Power of MR in within-family analysis
 date: "`r Sys.Date()`"
 output: 
-  pdf_document:
-    keep_tex: true
+  html_document
 ---
 
 
@@ -37,11 +36,11 @@ The genetic influence of each of the 90 SNPs on $x$ amounts to explaining $V_{gx
 
 ## Statistical models
 
-### Standard MR
+### Standard MR using unrelateds
 
 Use just one sibling from each family and perform MR as usual using IVW. This involves obtaining the SNP-exposure association for each of the 90 SNPs; the SNP-outcome association for each of the 90 SNPs, and estimating the slope underlying the relationship using inverse squared standard errors for weights.
 
-### Within-family $D^2$
+### $D^2$ using siblings
 
 The SNP-exposure estimates are performed within family. e.g. For SNP j
 
@@ -57,12 +56,14 @@ $$
 
 The $\beta_{xj}$ and $\beta_{yj}$ estimates are then used in a standard IVW framework to obtain the causal effect.
 
-### Within-family $S^2$
+Note that here $\hat{\pi}$ can represent locus-specific IBD estimates, IBS (weighted by allele frequency) or unwerighted IBS (simply the count of alleles in common).
+
+### $S^2$ using siblings
 
 Identical to the $D^2$ except the LHS of the equation is replaced with $(y_{i1} + y_{i2})^2$.
 
 
-### Within-family $D^2 + S^2$
+### $D^2 + S^2$ using siblings
 
 Following from Visscher and Hopper 2001 this approximates the maximum likelihood estimate of the within-family linkage analysis by meta-analysing the $D^2$ and $S^2$ results of each SNP-exposure and SNP-outcome estimate. The results are subsequently used to estimate the causal effect in the standard IVW framework.
 
@@ -74,12 +75,14 @@ v_{DS} &= \frac{1}{4} w v_D
 \end{aligned}
 $$
 
-### Hybrid
+### Simple sibling model
 
-Here the effect estimates for the SNP-exposure association are obtained externally (e.g. from a GWAS). In the case of the simulations, they are obtained from estimating $x = \beta_{xj} g + e$ using the fathers' simulated data. A weighted genetic difference between siblings is then obtained:
+The above sibling methods are forms of linkage analysis. 
+
+Here the effect estimates for the SNP-exposure association and SNP-outcomes are just based on correlating the phenotypic divergence with the genotypic divergence.
 
 $$
-\delta_{x_g,j} = \hat{\beta}_xj g_{i_1, j} - \hat{\beta}_xj g_{i_2, j}
+\delta_{x_g,j} = g_{i_1, j} - g_{i_2, j}
 $$
 
 The SNP's influence on the relationship between sibling genotypic difference and exposure difference is then obtained by regression:
@@ -96,16 +99,19 @@ $$
 
 The $\hat{\beta}_{yj}$ and $\hat{\beta}_{xj}$ estimates are then used in a standard IVW framework.
 
+### Trio design
+
+Here we simply adjust the SNP-exposure and SNP-outcome effects estimated in each child for their mother and father genotypes. The simulations were using just one child/mother/father per family.
+
 
 ## Results
 
 All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. somewhat similar to BMI with latest GIANT results).
 
 1. The standard MR estimate has high power for detecting association, but when confounding and dynastic effects are large there is an extremely high false discovery rate
-2. The within-family methods have extremely low power
-3. The hybrid approach appears to be well powered and with low FDR for the null model with dynastic effects. Also shows little bias in these simulations.
-4. Trio method is comparable to hybrid, with slightly better power when sample sizes are smaller
-5. The use of IBD, IBS and unweighted IBS are largely identical
+2. The linkage sibling methods have extremely low power, and amongst them the use of IBD, IBS and unweighted IBS are largely identical
+3. The simple sibling approach appears to be well powered and with low FDR for the null model with dynastic effects. Also shows little bias in these simulations.
+4. Trio method is comparable to simple sibling design, with slightly better power when sample sizes are smaller
 
 
 ```{r }
@@ -113,9 +119,9 @@ All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. s
 load("../results/sib_dynastic.rdata")
 
 dat$test <- as.factor(dat$test)
-levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid", "Trios")
-dat$b[dat$test %in% c("Hybrid", "Standard MR", "Trios")] <- dat$b[dat$test %in% c("Hybrid", "Standard MR", "Trios")]^2
-dat$se[dat$test %in% c("Hybrid", "Standard MR", "Trios")] <- dat$se[dat$test %in% c("Hybrid", "Standard MR", "Trios")]^2
+levels(dat$test) <- c("Unrelated", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Siblings", "Trios")
+dat$b[dat$test %in% c("Siblings", "Unrelated", "Trios")] <- dat$b[dat$test %in% c("Siblings", "Unrelated", "Trios")]^2
+dat$se[dat$test %in% c("Siblings", "Unrelated", "Trios")] <- dat$se[dat$test %in% c("Siblings", "Unrelated", "Trios")]^2
 
 ```
 
@@ -142,20 +148,21 @@ pow <- filter(dat) %>% group_by(n, vargx, eff_xy, eff_ux, eff_xu, model, test) %
 
 
 # pow$test <- as.factor(pow$test)
-# levels(pow$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid", "Trios")
+# levels(pow$test) <- c("Unrelated", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Siblings", "Trios")
 
 pow$eff_ux <- paste0("Confounder = ", pow$eff_ux)
 pow$eff_xu <- paste0("Dynastic = ", pow$eff_xu)
 
-pow2 <- subset(pow, test %in% c("Standard MR", "Hybrid", "Trios"))
+pow2 <- subset(pow, test %in% c("Unrelated", "Siblings", "Trios"))
 pow2$test <- as.factor(as.character(pow2$test))
-levels(pow2$test) <- c("Sibling MR", "Standard MR", "Trio MR")
+levels(pow2$test) <- c("Sibling MR", "Trio MR", "Unrelated")
+
 
 ```
 
 ```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
 
-ggplot(subset(pow, eff_xy == 0 & vargx == 0.1 & test != "Standard MR"), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
+ggplot(subset(pow, eff_xy == 0 & vargx == 0.1 & test != "Unrelated"), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(eff_xu ~ eff_ux) +
@@ -181,7 +188,7 @@ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 ```{r fig.cap="Bias in effect size estimates for different methods. No bias in within family or hybrid methods, but a lot in MR estimates when confounding and dynastic effects are non zero."}
 
 # dat$test <- as.factor(dat$test)
-# levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
+# levels(dat$test) <- c("Unrelated", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Siblings")
 
 # dat$eff_ux <- paste0("Confounder = ", dat$eff_ux)
 # dat$eff_xu <- paste0("Dynastic = ", dat$eff_xu)
@@ -233,7 +240,7 @@ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 ```{r fig.cap="Bias in effect size estimates for different methods. No bias in within family or hybrid methods, but a lot in MR estimates when confounding and dynastic effects are non zero."}
 
 # dat$test <- as.factor(dat$test)
-# levels(dat$test) <- c("Standard MR", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Hybrid")
+# levels(dat$test) <- c("Unrelated", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Siblings")
 
 # dat$eff_ux <- paste0("Confounder = ", dat$eff_ux)
 # dat$eff_xu <- paste0("Dynastic = ", dat$eff_xu)
@@ -253,4 +260,47 @@ labs(y="Bias (estimated effect - simulated effect)", x = "Simulated effect of x 
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 
 ```
+
+## False discovery rates
+
+Closer look at false discovery rates. For each of the three methods, what proportion of tests have a p-value exceeding some threshold when there is no causal effect. For example if the threshold is at 0.1, we expect 10% of null tests to give p < 0.1. This table shows the ratio of expected vs observed FDR, where >1 means that there are more false discoveries than expected by chance
+
+```{r}
+dat$test <- as.character(dat$test)
+temp <- dat %>% filter(eff_xy == 0, test %in% c("Unrelated", "Siblings", "Trios")) %>%
+group_by(test, confounding = eff_ux != 0, dynastic = eff_xu != 0) %>%
+summarise(
+	nsim=n(),
+	fdr_0.1=round(sum(pval < 0.1)/n() / 0.1, 2), 
+	fdr_0.01=round(sum(pval < 0.01)/n() / 0.01, 2), 
+	fdr_0.001=round(sum(pval < 0.001)/n() / 0.001, 2)
+)
+kable(temp)
+```
+
+Standard MR using unrelateds has extreme inflation in FDR when there is both confounding AND dynastic effects. It also has a small increase in FDR when there is any confounding (e.g. without a dynastic effect)
+
+Trio design has a small increase in FDR when there is confounding (with or without dynastic effects)
+
+The sib design might be a bit conservative when there are both confounding and dynastic effects
+
+
+## Power
+
+Do the same analysis again, except just looking at non-null causal relationships. i.e. How does the power compare between designs:
+
+```{r}
+dat$test <- as.character(dat$test)
+temp <- dat %>% filter(eff_xy != 0, test %in% c("Unrelated", "Siblings", "Trios")) %>%
+group_by(test, confounding = eff_ux != 0, dynastic = eff_xu != 0) %>%
+summarise(
+	nsim=n(),
+	fdr_0.1=round(sum(pval < 0.1)/n() / 0.1, 2), 
+	fdr_0.01=round(sum(pval < 0.01)/n() / 0.01, 2), 
+	fdr_0.001=round(sum(pval < 0.001)/n() / 0.001, 2)
+)
+kable(temp)
+```
+
+Trio design has slightly higher power than sibling design
 
