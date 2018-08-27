@@ -1,0 +1,71 @@
+---
+title: Sibling MR simulations
+---
+
+```{r}
+library(TwoSampleMR)
+```
+
+This file has some functions for simulation and for estimating the effects
+
+```{r}
+source("sib_mr_functions.r")
+```
+
+First simulate a dataset of families. 100000 families (two parents, two children) genotyped at 90 SNPs. The allele frequencies of the SNPs are uniformly distributed
+
+
+```{r}
+dat <- make_families(af = runif(90), nfam = 100000)
+glimpse(dat)
+```
+
+So this is a list of matrices. The only things that need to be used for the analysis are `dat$sibs1` and `dat$sibs2`. These are each 100000 individual x 90 SNP genotype matrices. each individual row represents a sib pair, e.g. row 1 in sibs1 and row 1 in sibs2 are two individuals in a sibship.
+
+Next make phenotypes. Sample some effect sizes for each of the 90 SNPs. The 90 SNPs will together explain 10% of the variance in the exposure
+
+```{r}
+eff <- chooseEffects(nsnp = 90, totvar = 0.1)
+```
+
+
+Using the family genotype data and these SNP effects, now generate exposure, outcome and confounder values for every individual. Need to specify how the confounder, x and y all relate to each other. `eff_xu` is the parental exposure's effect on the children's confounder values.
+
+```{r}
+phen <- dynastic_phen(
+	fam = dat, 
+	eff_gx = eff, 
+	eff_xy = sqrt(0.1), 
+	eff_ux = sqrt(0.1),
+	eff_uy = sqrt(0.1), 
+	eff_xu = sqrt(0.1)
+)
+```
+
+This generates a new list, with data for each family member -
+
+
+```{r}
+names(phen)
+```
+
+The `phen$sibs1` and `phen$sibs2` list items are data frames with the x and y phenotypes
+
+```{r}
+head(phen$sibs1)
+```
+
+Now we have genotype and phenotpye data for each of the siblings, so we can do sibling-based MR. This is what the function looks like:
+
+```{r}
+do_mr_wf
+```
+
+For each SNP it is estimating the influence of sibling genotype differences on sibling phenotype differences. It does this for the exposure and the outcome, retaining the effect estimates and standard errors.
+
+Once it has the effect estimates and standard errors for each SNP on the exposure and outcome, it can just run `mr_ivw` from the TwoSampleMR package
+
+```{r}
+do_mr_wf(dat, phen)
+```
+

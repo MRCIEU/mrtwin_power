@@ -284,7 +284,6 @@ do_mr_pop_wf <- function(fam, phen)
 
 do_mr_wf <- function(fam, phen, method="diff")
 {
-	# bx <- gwas(phen$dads$x, fam$dads)$bhat
 	nsnp <- ncol(fam$dads)
 	sbx <- rep(NA, nsnp)
 	sby <- rep(NA, nsnp)
