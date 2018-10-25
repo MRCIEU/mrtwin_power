@@ -310,6 +310,7 @@ do_mr_wf <- function(fam, phen, method="diff")
 	return(mr_ivw(sbx, sby, ssex, ssey))
 }
 
+
 do_mr_trio <- function(fam, phen)
 {
 	nsnp <- ncol(fam$dads)
@@ -327,6 +328,28 @@ do_mr_trio <- function(fam, phen)
 		bx[i] <- mod[2,1]
 		sex[i] <- mod[2,2]
 		mod <- summary(lm(phen$sibs1$y ~ fam$sibs1[,i] + fam$dads[,i] + fam$mums[,i]))$coefficients
+		by[i] <- mod[2,1]
+		sey[i] <- mod[2,2]
+	}
+	return(mr_ivw(bx, by, sex, sey))
+}
+
+
+do_mr_ff <- function(fam, phen)
+{
+	require(lme4)
+	nsnp <- ncol(fam$dads)
+	bx <- rep(NA, nsnp)
+	by <- rep(NA, nsnp)
+	sex <- rep(NA, nsnp)
+	sey <- rep(NA, nsnp)
+	ff <- as.factor(rep(1:length(phen$sibs1$x), times=2))
+	for(i in 1:nsnp)
+	{
+		mod <- summary(lmer(c(phen$sibs1$x, phen$sibs2$x) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + (1|ff)))$coefficients
+		bx[i] <- mod[2,1]
+		sex[i] <- mod[2,2]
+		mod <- summary(lmer(c(phen$sibs1$y, phen$sibs2$y) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + (1|ff)))$coefficients
 		by[i] <- mod[2,1]
 		sey[i] <- mod[2,2]
 	}
