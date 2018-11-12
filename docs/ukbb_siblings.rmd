@@ -1,0 +1,120 @@
+---
+title: Sib pairs in UKBB
+date: 12/11/2018
+---
+
+
+Questions:
+
+1. How many sib pairs are there
+2. Is the distribution of sib pairs different from what we expect by chance? (e.g. due to ascertainment)
+
+Full sibs should be IBS of 0.5 (expected) with ~0.36 standard deviation. This means some full sibs look like parent-offspring, and some full sibs (who happen to have little sharing) will look like half-sibs (expected 0.25, with sd of 0.25).
+
+[https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3070763/](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3070763/)
+
+Helpfully, the data contains IBS0 (proportion of loci that are unshared between individuals) as well as IBS kinship (average sharing across all loci). Parent offspring will have 0% IBS0, and the IBS0 sharing between half sibs and fullsibs will follow different distributions, so there should be minimal overlap across these two dimensions.
+
+
+## Analysis
+
+Read in data
+
+```{r}
+library(data.table)
+a <- fread("../data/ukb8786_rel_s488295.dat")
+str(a)
+```
+
+```{r}
+sum(a$Kinship == -1)
+```
+
+Some of the relationships are -1, remove them
+
+```{r}
+a <- subset(a, Kinship != -1)
+a$Kinship <- a$Kinship * 2 
+```
+
+Distribution of all relationships
+
+```{r}
+hist(a$Kinship, breaks=200)
+hist(a$IBS0, breaks=200)
+plot(Kinship ~ IBS0, a)
+```
+
+Now we will try to identify the samples within the main central ovoid cluster, which should represent the sibling pairs. 
+
+Try k-means:
+
+```{r}
+temp <- cbind(scale(a$Kinship), scale(a$IBS0))
+
+clust <- kmeans(temp, centers=4)
+library(ggplot2)
+ggplot(a, aes(x=IBS0, y=Kinship)) +
+geom_point(aes(col=as.factor(clust$cluster))) +
+scale_colour_brewer(type="qual") +
+labs(colour="Cluster")
+
+```
+
+This does not work well.
+
+Try gaussian mixture model:
+
+```{r}
+# library(ClusterR)
+# gmm = GMM(temp, 4, dist_mode = "maha_dist", seed_mode = "random_subset", km_iter = 10, em_iter = 10, verbose = F) 
+
+library(mclust)
+temp <- cbind(scale(a$Kinship), scale(a$IBS0))
+xyMclust <- Mclust(temp, G=4)
+plot(xyMclust)
+
+```
+
+Better but still not good enough.
+
+Try doing it by eye:
+
+```{r}
+library(ggplot2)
+index <-	a$Kinship > (a$IBS0 * -21 + 0.5) &
+			a$Kinship < 0.7 &
+			a$IBS0 > 0.001 &
+			a$IBS0 < 0.008
+ggplot(a, aes(x=IBS0, y=Kinship)) +
+geom_point(aes(col=as.factor(index))) +
+scale_colour_brewer(type="qual") +
+geom_abline(intercept=0.5, slope=-21) +
+geom_hline(yintercept=0.7) +
+geom_vline(xintercept=0.008) +
+geom_vline(xintercept=0.001) +
+labs(colour="Full sibs")
+```
+
+```{r}
+sibs <- subset(a, index)
+nrow(sibs)
+```
+
+Distribution of sibs
+
+```{r}
+hist(sibs$Kinship)
+```
+
+Summary of sibs
+
+```{r}
+summary(sibs$Kinship)
+```
+
+Save the sib pairs
+
+```{r}
+a$sibpair <- index
+write.csv(a, file="../data/ukbb_sibs.csv")
