@@ -1,0 +1,218 @@
+---
+title: PLM and DiD models for UKBB
+---
+
+```{r}
+suppressPackageStartupMessages(suppressWarnings({
+	library(dplyr)
+	library(data.table)
+	library(dplyr)
+	library(TwoSampleMR)
+	library(plm)
+	library(knitr)
+}))
+opts_chunk$set(warning=FALSE, cache=TRUE, echo=TRUE)
+```
+
+## Simulations to see if DiD and PLM give the same estimates
+
+```{r}
+n <- 100000
+g <- rbinom(n, 2, 0.5)
+x <- g + rnorm(n)
+y <- 2 * x + rnorm(n)
+
+fam <- rep(1:(n/2), each=2)
+sib <- rep(1:2, times=n/2)
+
+dat <- data_frame(g,x,y,fam,sib)
+
+dat1 <- subset(dat, sib==1)
+dat2 <- subset(dat, sib==2)
+
+dif <- data_frame(
+	g = dat1$g - dat2$g,
+	x = dat1$x - dat2$x,
+	y = dat1$y - dat2$y
+)
+```
+
+Get the Wald ratio using DiD estimate:
+
+```{r}
+coefficients(lm(y ~ g, dif))[2] / coefficients(lm(x ~ g, dif))[2]
+```
+
+Get the PLM estimate:
+
+```{r}
+plm(y ~ x | g, data=dat, index="fam", model="within", inst.method="bvk")
+```
+
+Note that DiD ran instantly but PLM took about 20 seconds
+
+## Compare PLM and DiD in UKBB data
+
+Read in the data
+
+```{r}
+setwd("/projects/MRC-IEU/research/projects/ieu2/p1/002/working/data/")
+load("ukbb/data_sibs")
+```
+
+Create sib pairs for DiD model:
+
+```{r}
+a <- merge(data_sibs, data_sibs, by="famid", allow.cartesian=TRUE)
+a <- subset(a, n_eid.x > n_eid.y)
+dim(a)
+```
+
+Here `a` is just all the variables combined together by sibling pair. So a variable called `n_eid` in the original `data_sibs` is now present twice, called `n_eid.x` and `n_eid.y` for each sib pair.
+
+Using these data we can get the DiD estimates for each SNP using this function, adapted from the one used in the simulations but methodologically identical. 
+
+```{r}
+do_mr_wf_tab <- function(dat, inst, x, y)
+{
+	nsnp <- length(inst)
+	sbx <- rep(NA, nsnp)
+	sby <- rep(NA, nsnp)
+	ssex <- rep(NA, nsnp)
+	ssey <- rep(NA, nsnp)
+	sdiffx <- dat[[paste0(x, ".x")]] - dat[[paste0(x, ".y")]]
+	sdiffy <- dat[[paste0(y, ".x")]] - dat[[paste0(y, ".y")]]
+	for(i in 1:nsnp)
+	{
+		sdiffgx <- dat[[paste0(inst[i], ".x")]] - dat[[paste0(inst[i], ".y")]]
+		mod <- summary(lm(sdiffx ~ sdiffgx))
+		sbx[i] <- coefficients(mod)[2,1]
+		ssex[i] <- coefficients(mod)[2,2]
+		mod <- summary(lm(sdiffy ~ sdiffgx))
+		sby[i] <- coefficients(mod)[2,1]
+		ssey[i] <- coefficients(mod)[2,2]
+	}
+	return(data_frame(inst, sbx, sby, ssex, ssey))
+	# return(mr_ivw(sbx, sby, ssex, ssey))
+}
+```
+
+Note, it returns the exposure and outcome effect estimates for each SNP instead of the MR IVW estimate, so it's a bit more flexible in allowing us to investigate the results.
+
+Get the DiD estimates for the first 20 SNPs, for exposure = eduyears2 and outcome = out_height
+
+```{r}
+rsid <- grep("^rs", names(data_sibs), value=TRUE)[1:20]
+DiD <- do_mr_wf_tab(a, rsid, "eduyears2", "out_height")
+```
+
+Estimate the Wald ratios:
+
+```{r}
+DiD$b <- DiD$sby / DiD$sbx
+kable(DiD)
+```
+
+Get the causal effect estimates for each of the 20 SNPs using PLM
+
+```{r}
+PLM <- list()
+for(i in 1:length(rsid))
+{
+	f <- as.formula(paste0("out_height ~ eduyears2 | ", rsid[i]))
+	temp <- plm(f, data=data_sibs, index="famid", model="within", inst.method="bvk") %>% summary %>% coefficients
+	PLM[[i]] <- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
+}
+PLM <- bind_rows(PLM)
+kable(PLM)
+```
+
+How do they compare?
+
+```{r}
+cor(PLM$b, DiD$b)
+```
+
+```{r}
+plot(PLM$b, DiD$b)
+```
+
+When the estimates are small they are generally in agreement, but there are some totally wild estimates. This is probably because they are not instruments for eduyears2. Do it again but restrict to SNPs that strongly associate with eduyears2
+
+## Finding instruments for eduyears2
+
+```{r}
+rsid <- grep("^rs", names(data_sibs), value=TRUE)
+pval <- rep(NA, length(rsid))
+for(i in 1:length(rsid))
+{
+	f <- as.formula(paste0("eduyears2 ~ ", rsid[i], " + ", paste(paste0("pc", 1:40), collapse=" + ")))
+	pval[i] <- summary(lm(f, data=subset(data_sibs, !duplicated(famid))))$coefficients[2,4]
+}
+sum(pval < 0.05 / length(rsid))
+```
+
+None of these variants associate with education?
+Try height
+
+## Finding instruments for height
+
+```{r}
+pval <- rep(NA, length(rsid))
+for(i in 1:length(rsid))
+{
+	f <- as.formula(paste0("out_height ~ ", rsid[i], " + ", paste(paste0("pc", 1:40), collapse=" + ")))
+	pval[i] <- summary(lm(f, data=subset(data_sibs, !duplicated(famid))))$coefficients[2,4]
+}
+sum(pval < 0.05 / length(rsid))
+min(pval)
+```
+
+We find some instruments for height. Try the MR estimates again but do height -> edu and use the significant height SNPs
+
+## Comparison of PLM and DiD in UKBB using strong instruments for height
+
+```{r}
+rsid_sig <- rsid[pval < 0.05 / length(rsid)]
+DiD <- do_mr_wf_tab(a, rsid_sig, x = "out_height", y = "eduyears2")
+DiD$b <- DiD$sby / DiD$sbx
+PLM <- list()
+for(i in 1:length(rsid_sig))
+{
+	f <- as.formula(paste0("eduyears2 ~ out_height | ", rsid_sig[i]))
+	temp <- plm(f, data=data_sibs, index="famid", model="within", inst.method="bvk") %>% summary %>% coefficients
+	PLM[[i]] <- data_frame(inst=rsid_sig[i], b = temp[1], se=temp[2], pval=temp[4])
+}
+PLM <- bind_rows(PLM)
+
+cor(PLM$b, DiD$b)
+plot(PLM$b, DiD$b)
+```
+
+Ok now there is very strong agreement
+
+
+## Summary
+
+When the instruments show some indication of association with the exposure then we are getting very strong agreement between PLM and DiD, but it's not perfect. 
+Going forwards, we can use IVW, median and mode estimators on DiD estimates; e.g.
+
+```{r}
+mr_ivw(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)
+```
+
+Similarly - 
+
+```r
+mr_weighted_median(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)
+mr_weighted_mode(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)
+```
+
+We can also meta analyse the PLM estimates, but need to think about how to do the pleiotropy robust methods because by default we need the exposure and outcome SNP effects, not the actual ratios. 
+
+```{r}
+meta::metagen(PLM$b, PLM$se)
+```
+
+The IVW estimates using DID and PLM are in the same ballpark but certainly not identical here. 
+
