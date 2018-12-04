@@ -237,5 +237,24 @@ cor(PLM$b, DiD$b)
 plot(PLM$b, DiD$b)
 ```
 
+Remove crazy effects
+
+```{r}
+index <- abs(DiD$b) > 2 | abs(PLM$b) > 2
+cor(PLM$b[!index], DiD$b[!index])
+plot(PLM$b[!index], DiD$b[!index])
+```
+
+
+Now meta analyse across individual SNP estimates
+
+```{r}
+meta::metagen(PLM$b, PLM$se)
+```
+
+```{r}
+mr_ivw(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)
+```
+
 
 
