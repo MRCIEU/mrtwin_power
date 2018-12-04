@@ -216,3 +216,26 @@ meta::metagen(PLM$b, PLM$se)
 
 The IVW estimates using DID and PLM are in the same ballpark but certainly not identical here. 
 
+
+## Just do height -> eduyears2 without instrument restriction
+
+
+```{r}
+DiD <- do_mr_wf_tab(a, rsid, x = "out_height", y = "eduyears2")
+DiD$b <- DiD$sby / DiD$sbx
+PLM <- list()
+for(i in 259:length(rsid))
+{
+	message(i, " of ", length(rsid))
+	f <- as.formula(paste0("eduyears2 ~ out_height | ", rsid[i]))
+	temp <- plm(f, data=data_sibs, index="famid", model="within", inst.method="bvk") %>% summary %>% coefficients
+	PLM[[i]] <- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
+}
+PLM <- bind_rows(PLM)
+
+cor(PLM$b, DiD$b)
+plot(PLM$b, DiD$b)
+```
+
+
+
