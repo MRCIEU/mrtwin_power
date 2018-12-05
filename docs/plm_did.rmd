@@ -11,7 +11,7 @@ suppressPackageStartupMessages(suppressWarnings({
 	library(plm)
 	library(knitr)
 }))
-opts_chunk$set(warning=FALSE, cache=TRUE, echo=TRUE)
+opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=TRUE)
 ```
 
 ## Simulations to see if DiD and PLM give the same estimates
@@ -226,7 +226,6 @@ DiD$b <- DiD$sby / DiD$sbx
 PLM <- list()
 for(i in 1:length(rsid[1:385]))
 {
-	message(i, " of ", length(rsid))
 	f <- as.formula(paste0("eduyears2 ~ out_height | ", rsid[i]))
 	temp <- plm(f, data=data_sibs, index="famid", model="within", inst.method="bvk") %>% summary %>% coefficients
 	PLM[[i]] <- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
@@ -255,6 +254,17 @@ meta::metagen(PLM$b, PLM$se)
 ```{r}
 mr_ivw(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)
 ```
+
+
+## Final thoughts
+
+When instruments are very strong the agreement between PLM and DiD is near perfect. That there are larger differences when using weak instruments indicates that the DiD method is likely not accounting for this appropriately, so the standard errors are liable to be associated with confounding for example. 
+
+PLM however is extremely slow, making simulations somewhat prohibitive. Moving forwards we can 
+
+1. Use PLM for empirical analysis
+2. Show theoretically that it is equivalent to DiD in most scenarios
+3. Present simulations using DiD to illustrate the solution to the problem of dynastic effects, while explaining that in practice PLM is more appropriate.
 
 
 
