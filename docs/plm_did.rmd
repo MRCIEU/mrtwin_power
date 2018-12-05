@@ -221,7 +221,7 @@ The IVW estimates using DID and PLM are in the same ballpark but certainly not i
 
 
 ```{r}
-DiD <- do_mr_wf_tab(a, rsid, x = "out_height", y = "eduyears2")
+DiD <- do_mr_wf_tab(a, rsid[1:385], x = "out_height", y = "eduyears2")
 DiD$b <- DiD$sby / DiD$sbx
 PLM <- list()
 for(i in 1:length(rsid[1:385]))

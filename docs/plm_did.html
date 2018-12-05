@@ -686,6 +686,1227 @@ mr_weighted_mode(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)</code></pre>
 ## - DerSimonian-Laird estimator for tau^2</code></pre>
 <p>The IVW estimates using DID and PLM are in the same ballpark but certainly not identical here.</p>
 </div>
+<div id="just-do-height---eduyears2-without-instrument-restriction" class="section level2">
+<h2>Just do height -&gt; eduyears2 without instrument restriction</h2>
+<pre class="r"><code>DiD &lt;- do_mr_wf_tab(a, rsid[1:385], x = &quot;out_height&quot;, y = &quot;eduyears2&quot;)
+DiD$b &lt;- DiD$sby / DiD$sbx
+PLM &lt;- list()
+for(i in 1:length(rsid[1:385]))
+{
+    message(i, &quot; of &quot;, length(rsid))
+    f &lt;- as.formula(paste0(&quot;eduyears2 ~ out_height | &quot;, rsid[i]))
+    temp &lt;- plm(f, data=data_sibs, index=&quot;famid&quot;, model=&quot;within&quot;, inst.method=&quot;bvk&quot;) %&gt;% summary %&gt;% coefficients
+    PLM[[i]] &lt;- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
+}</code></pre>
+<pre><code>## 1 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 2 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 3 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 4 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 5 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 6 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 7 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 8 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 9 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 10 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 11 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 12 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 13 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 14 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 15 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 16 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 17 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 18 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 19 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 20 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 21 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 22 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 23 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 24 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 25 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 26 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 27 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 28 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 29 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 30 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 31 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 32 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 33 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 34 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 35 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 36 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 37 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 38 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 39 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 40 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 41 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 42 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 43 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 44 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 45 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 46 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 47 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 48 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 49 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 50 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 51 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 52 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 53 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 54 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 55 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 56 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 57 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 58 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 59 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 60 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 61 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 62 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 63 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 64 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 65 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 66 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 67 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 68 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 69 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 70 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 71 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 72 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 73 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 74 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 75 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 76 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 77 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 78 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 79 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 80 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 81 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 82 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 83 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 84 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 85 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 86 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 87 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 88 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 89 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 90 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 91 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 92 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 93 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 94 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 95 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 96 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 97 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 98 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 99 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 100 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 101 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 102 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 103 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 104 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 105 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 106 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 107 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 108 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 109 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 110 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 111 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 112 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 113 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 114 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 115 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 116 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 117 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 118 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 119 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 120 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 121 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 122 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 123 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 124 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 125 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 126 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 127 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 128 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 129 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 130 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 131 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 132 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 133 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 134 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 135 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 136 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 137 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 138 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 139 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 140 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 141 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 142 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 143 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 144 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 145 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 146 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 147 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 148 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 149 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 150 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 151 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 152 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 153 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 154 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 155 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 156 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 157 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 158 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 159 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 160 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 161 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 162 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 163 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 164 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 165 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 166 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 167 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 168 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 169 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 170 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 171 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 172 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 173 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 174 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 175 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 176 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 177 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 178 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 179 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 180 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 181 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 182 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 183 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 184 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 185 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 186 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 187 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 188 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 189 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 190 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 191 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 192 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 193 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 194 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 195 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 196 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 197 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 198 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 199 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 200 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 201 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 202 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 203 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 204 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 205 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 206 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 207 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 208 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 209 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 210 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 211 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 212 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 213 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 214 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 215 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 216 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 217 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 218 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 219 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 220 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 221 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 222 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 223 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 224 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 225 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 226 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 227 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 228 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 229 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 230 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 231 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 232 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 233 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 234 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 235 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 236 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 237 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 238 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 239 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 240 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 241 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 242 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 243 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 244 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 245 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 246 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 247 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 248 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 249 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 250 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 251 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 252 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 253 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 254 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 255 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 256 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 257 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 258 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 259 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 260 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 261 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 262 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 263 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 264 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 265 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 266 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 267 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 268 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 269 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 270 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 271 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 272 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 273 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 274 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 275 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 276 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 277 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 278 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 279 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 280 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 281 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 282 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 283 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 284 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 285 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 286 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 287 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 288 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 289 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 290 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 291 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 292 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 293 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 294 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 295 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 296 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 297 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 298 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 299 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 300 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 301 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 302 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 303 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 304 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 305 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 306 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 307 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 308 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 309 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 310 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 311 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 312 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 313 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 314 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 315 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 316 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 317 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 318 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 319 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 320 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 321 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 322 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 323 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 324 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 325 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 326 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 327 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 328 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 329 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 330 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 331 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 332 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 333 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 334 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 335 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 336 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 337 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 338 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 339 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 340 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 341 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 342 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 343 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 344 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 345 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 346 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 347 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 348 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 349 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 350 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 351 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 352 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 353 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 354 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 355 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 356 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 357 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 358 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 359 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 360 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 361 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 362 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 363 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 364 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 365 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 366 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 367 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 368 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 369 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 370 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 371 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 372 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 373 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 374 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 375 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 376 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 377 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 378 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 379 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 380 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 381 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 382 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 383 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 384 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre><code>## 385 of 464</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex</code></pre>
+<pre class="r"><code>PLM &lt;- bind_rows(PLM)
+
+cor(PLM$b, DiD$b)</code></pre>
+<pre><code>## [1] -0.1302069</code></pre>
+<pre class="r"><code>plot(PLM$b, DiD$b)</code></pre>
+<p><img src="data:image/png;base64,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+lxHOdo+WdA4+jF88xcSXAEBBeAfowL6V7uZdkCfzbBP8/doZv8/K8GCElAA/jEpoJ9liRy2yFpnb3/2en67ZX1+vEiz9QmtgoAC8I9JAT1D5Ab75GaRHpEvIIUni8xIaBUEFIB/TApoe+nj7Dp/uMiT0SXFbeSAhFZBQAH4x6SAZsoFzklPkZ9ji86UooRWQUAB+MekgObKpc5JX5HtsUVTJZTQKggoAP+YFNCekfodL/K/2KLx0jihVRBQAP4xKaAXSegd++R5keuiS34oTDCIBBSAf0wK6Fc50vRlywqPl8L/uAu2DBd5MKFVEFAA/jEpoNZfRGTInR9+e7LUv3FlyQ8P9RAZWJLQGggoAP8YFdDwNaEKR6Tff21iayCgAPxjVEAt671DvQltc8v2qi8Sh4AC8I9hAbWsr+89+9C9unXdc+C4qxcn9vLdQUAB+Me4gNYMAQXgHwIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKBFQAFAioACgREABQImAAoASAQUAJQIKAEoEFACUCCgAKJkW0I2PTBrUrl5GqKDtwLOf2JzwxQkoAP+YFdANkwvFo+iKRBNKQAH4x6iArujsdjO3VadOrfPcyV5rElsDAQXgH5MCWtxbJP+MZ9aEnZnwdwvPayjSf1tCqyCgAPxjUkDniAxY7V2wbrTIXQmtgoAC8I9JAT1YGq6NX7K1mxyc0CoIKAD/mBTQIjmt4qLrpEFCqyCgAPxjUkBDMrXiormSkdAqCCgA/5gU0KZyXMVF06RJ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" width="672" /></p>
+<p>Remove crazy effects</p>
+<pre class="r"><code>index &lt;- abs(DiD$b) &gt; 2 | abs(PLM$b) &gt; 2
+cor(PLM$b[!index], DiD$b[!index])</code></pre>
+<pre><code>## [1] 0.9273311</code></pre>
+<pre class="r"><code>plot(PLM$b[!index], DiD$b[!index])</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>Now meta analyse across individual SNP estimates</p>
+<pre class="r"><code>meta::metagen(PLM$b, PLM$se)</code></pre>
+<pre><code>##                               95%-CI %W(fixed) %W(random)
+## 1     0.2089 [   -2.1656;    2.5834]       0.0        0.0
+## 2     0.1722 [   -0.4594;    0.8037]       0.4        0.4
+## 3    -0.2313 [   -0.9664;    0.5038]       0.3        0.3
+## 4     0.0580 [   -0.5964;    0.7124]       0.4        0.4
+## 5     0.0045 [   -1.8278;    1.8369]       0.0        0.0
+## 6    -0.0468 [   -1.0706;    0.9770]       0.2        0.2
+## 7     0.0258 [   -0.5285;    0.5800]       0.5        0.5
+## 8    -0.4444 [   -1.6075;    0.7187]       0.1        0.1
+## 9     0.8932 [   -1.4796;    3.2660]       0.0        0.0
+## 10    1.0680 [   -3.2258;    5.3618]       0.0        0.0
+## 11   -0.7413 [   -2.0365;    0.5539]       0.1        0.1
+## 12   -0.1614 [   -1.0344;    0.7115]       0.2        0.2
+## 13    1.5220 [   -4.2846;    7.3287]       0.0        0.0
+## 14   -0.2177 [   -0.6939;    0.2585]       0.7        0.7
+## 15   -1.1412 [   -5.0640;    2.7816]       0.0        0.0
+## 16    0.3047 [   -0.6756;    1.2850]       0.2        0.2
+## 17   -0.0183 [   -0.6756;    0.6390]       0.4        0.4
+## 18    0.2624 [   -2.6890;    3.2137]       0.0        0.0
+## 19    0.9520 [   -1.4788;    3.3827]       0.0        0.0
+## 20    4.9994 [  -58.1539;   68.1528]       0.0        0.0
+## 21   -0.0678 [   -0.4965;    0.3609]       0.9        0.9
+## 22   -1.1753 [   -2.7513;    0.4007]       0.1        0.1
+## 23   -0.4402 [   -1.6753;    0.7949]       0.1        0.1
+## 24   -0.2287 [   -0.8228;    0.3654]       0.5        0.5
+## 25    0.1741 [   -0.3067;    0.6549]       0.7        0.7
+## 26   -0.6376 [   -2.0698;    0.7945]       0.1        0.1
+## 27   -1.0037 [   -7.5352;    5.5279]       0.0        0.0
+## 28    0.0896 [   -0.4019;    0.5811]       0.7        0.7
+## 29   -0.1864 [   -1.4732;    1.1004]       0.1        0.1
+## 30    0.0250 [   -1.4212;    1.4712]       0.1        0.1
+## 31    0.0170 [   -0.8496;    0.8837]       0.2        0.2
+## 32   -0.1524 [   -0.6342;    0.3295]       0.7        0.7
+## 33   -0.3796 [   -1.7124;    0.9531]       0.1        0.1
+## 34   -0.2085 [   -0.9605;    0.5435]       0.3        0.3
+## 35   -1.2352 [   -5.4177;    2.9473]       0.0        0.0
+## 36    3.1225 [  -15.7000;   21.9450]       0.0        0.0
+## 37    0.1065 [   -0.6768;    0.8897]       0.3        0.3
+## 38    0.0224 [   -0.7419;    0.7867]       0.3        0.3
+## 39    0.3756 [   -0.4371;    1.1883]       0.2        0.2
+## 40   -0.1671 [   -0.8678;    0.5336]       0.3        0.3
+## 41   -0.4784 [   -1.6345;    0.6777]       0.1        0.1
+## 42    0.3096 [   -0.4442;    1.0633]       0.3        0.3
+## 43   -0.1744 [   -0.5756;    0.2269]       1.0        1.0
+## 44   -0.6108 [   -2.6658;    1.4443]       0.0        0.0
+## 45   -0.1796 [   -0.7377;    0.3785]       0.5        0.5
+## 46    3.0009 [  -12.9854;   18.9871]       0.0        0.0
+## 47   -0.2121 [   -0.5537;    0.1295]       1.4        1.4
+## 48    0.0074 [   -1.0632;    1.0781]       0.1        0.1
+## 49  -13.6623 [ -893.1234;  865.7989]       0.0        0.0
+## 50   -0.1484 [   -0.9081;    0.6113]       0.3        0.3
+## 51    0.5286 [   -0.6533;    1.7106]       0.1        0.1
+## 52    1.2630 [   -4.8209;    7.3470]       0.0        0.0
+## 53   -0.4757 [   -1.1043;    0.1528]       0.4        0.4
+## 54   -0.1422 [   -0.9396;    0.6552]       0.3        0.3
+## 55    0.0233 [   -1.1162;    1.1628]       0.1        0.1
+## 56   -1.1822 [   -4.4441;    2.0796]       0.0        0.0
+## 57    1.0374 [   -9.8852;   11.9600]       0.0        0.0
+## 58   -0.5665 [   -3.8589;    2.7259]       0.0        0.0
+## 59   -0.2026 [   -1.9042;    1.4990]       0.1        0.1
+## 60    1.3682 [   -4.1312;    6.8676]       0.0        0.0
+## 61   -0.1940 [   -1.0223;    0.6342]       0.2        0.2
+## 62    0.2466 [   -0.2389;    0.7321]       0.7        0.7
+## 63   -0.0481 [   -0.8764;    0.7802]       0.2        0.2
+## 64   -0.5789 [   -2.3420;    1.1843]       0.1        0.1
+## 65    1.7305 [   -5.1508;    8.6117]       0.0        0.0
+## 66   -0.1722 [   -0.9597;    0.6152]       0.3        0.3
+## 67    0.3088 [   -0.2717;    0.8893]       0.5        0.5
+## 68    2.3837 [  -10.9887;   15.7560]       0.0        0.0
+## 69    0.2674 [   -0.3488;    0.8835]       0.4        0.4
+## 70   -0.0357 [   -0.8834;    0.8119]       0.2        0.2
+## 71    0.1239 [   -0.2910;    0.5387]       0.9        0.9
+## 72    0.2807 [   -1.2865;    1.8479]       0.1        0.1
+## 73    1.2136 [  -14.7347;   17.1620]       0.0        0.0
+## 74   -2.1221 [  -10.0429;    5.7987]       0.0        0.0
+## 75    0.0905 [   -0.6824;    0.8633]       0.3        0.3
+## 76    0.1915 [   -0.1370;    0.5200]       1.5        1.5
+## 77    0.2051 [   -0.5594;    0.9696]       0.3        0.3
+## 78   -0.0962 [   -0.7729;    0.5804]       0.4        0.4
+## 79    0.0994 [   -0.2155;    0.4142]       1.6        1.6
+## 80   -0.4628 [   -1.1706;    0.2451]       0.3        0.3
+## 81    0.0308 [   -1.5575;    1.6191]       0.1        0.1
+## 82   -0.3672 [   -1.8471;    1.1128]       0.1        0.1
+## 83    0.4664 [   -0.1119;    1.0447]       0.5        0.5
+## 84    1.1368 [   -2.3847;    4.6583]       0.0        0.0
+## 85   -1.1434 [   -4.0021;    1.7153]       0.0        0.0
+## 86    0.5092 [   -0.6691;    1.6875]       0.1        0.1
+## 87  -20.6915 [-1990.2505; 1948.8675]       0.0        0.0
+## 88    0.7697 [   -0.5984;    2.1378]       0.1        0.1
+## 89    0.3122 [   -0.6204;    1.2447]       0.2        0.2
+## 90    0.1186 [   -0.3054;    0.5426]       0.9        0.9
+## 91    0.5798 [   -0.6120;    1.7716]       0.1        0.1
+## 92    3.4695 [ -154.5053;  161.4442]       0.0        0.0
+## 93    0.3921 [   -1.1556;    1.9398]       0.1        0.1
+## 94    0.5239 [   -0.0866;    1.1345]       0.4        0.4
+## 95    0.6743 [   -2.7830;    4.1316]       0.0        0.0
+## 96  -10.8460 [ -201.4547;  179.7627]       0.0        0.0
+## 97   -0.0617 [   -0.3175;    0.1942]       2.5        2.5
+## 98    0.2010 [   -0.6103;    1.0122]       0.2        0.2
+## 99    0.6953 [   -1.1158;    2.5064]       0.0        0.0
+## 100  -1.2003 [   -4.2199;    1.8194]       0.0        0.0
+## 101  -0.5300 [   -1.6041;    0.5441]       0.1        0.1
+## 102  -0.2797 [   -1.0807;    0.5212]       0.3        0.3
+## 103  -6.3260 [ -111.4946;   98.8426]       0.0        0.0
+## 104  -8.9708 [ -337.7794;  319.8377]       0.0        0.0
+## 105   0.4702 [   -1.8718;    2.8122]       0.0        0.0
+## 106  -0.9673 [   -4.5217;    2.5872]       0.0        0.0
+## 107   0.3288 [   -0.5243;    1.1819]       0.2        0.2
+## 108   0.3903 [   -0.8952;    1.6759]       0.1        0.1
+## 109  -0.1017 [   -0.6690;    0.4655]       0.5        0.5
+## 110   0.1040 [   -0.2645;    0.4726]       1.2        1.2
+## 111  -0.1224 [   -1.5704;    1.3257]       0.1        0.1
+## 112   0.4856 [   -1.7038;    2.6750]       0.0        0.0
+## 113   0.0499 [   -3.0344;    3.1342]       0.0        0.0
+## 114   0.5197 [   -0.7644;    1.8037]       0.1        0.1
+## 115  -0.0126 [   -0.9599;    0.9347]       0.2        0.2
+## 116   0.7569 [   -7.2569;    8.7707]       0.0        0.0
+## 117   1.9721 [  -14.5258;   18.4700]       0.0        0.0
+## 118   0.1398 [   -9.7717;   10.0512]       0.0        0.0
+## 119   0.1945 [   -0.4156;    0.8047]       0.4        0.4
+## 120  -0.6825 [   -2.4676;    1.1026]       0.1        0.1
+## 121  -0.7721 [   -2.3794;    0.8352]       0.1        0.1
+## 122   0.2021 [   -1.4530;    1.8571]       0.1        0.1
+## 123  -0.4585 [   -2.4175;    1.5004]       0.0        0.0
+## 124  -0.6388 [   -3.5899;    2.3122]       0.0        0.0
+## 125   0.0905 [   -1.5912;    1.7722]       0.1        0.1
+## 126   3.5833 [  -24.7396;   31.9062]       0.0        0.0
+## 127   0.0504 [   -0.4461;    0.5469]       0.7        0.7
+## 128   0.1251 [   -0.1342;    0.3845]       2.4        2.4
+## 129   1.5314 [   -2.5224;    5.5852]       0.0        0.0
+## 130  -1.0123 [   -3.0402;    1.0156]       0.0        0.0
+## 131   0.3793 [   -0.5688;    1.3274]       0.2        0.2
+## 132   0.0259 [   -1.2463;    1.2980]       0.1        0.1
+## 133  -0.2542 [   -1.2482;    0.7398]       0.2        0.2
+## 134   0.2567 [   -2.5103;    3.0236]       0.0        0.0
+## 135  -0.0770 [   -0.9247;    0.7708]       0.2        0.2
+## 136   0.4751 [   -1.3218;    2.2721]       0.1        0.1
+## 137  -0.1109 [   -0.8336;    0.6119]       0.3        0.3
+## 138   0.5176 [   -0.4349;    1.4701]       0.2        0.2
+## 139  -0.0668 [   -0.3805;    0.2469]       1.7        1.7
+## 140  -3.4042 [  -45.3452;   38.5368]       0.0        0.0
+## 141  -3.5483 [  -30.6933;   23.5966]       0.0        0.0
+## 142  -0.0357 [   -0.5305;    0.4591]       0.7        0.7
+## 143  -3.5133 [  -23.3387;   16.3122]       0.0        0.0
+## 144   0.0493 [   -0.9585;    1.0570]       0.2        0.2
+## 145  -0.1853 [   -1.1473;    0.7766]       0.2        0.2
+## 146   0.0418 [   -0.7170;    0.8007]       0.3        0.3
+## 147  -0.6148 [   -2.9068;    1.6773]       0.0        0.0
+## 148   0.4279 [   -0.4283;    1.2841]       0.2        0.2
+## 149  -0.3404 [   -1.2722;    0.5914]       0.2        0.2
+## 150  -0.0409 [   -0.7316;    0.6498]       0.3        0.3
+## 151   0.0238 [   -1.2975;    1.3451]       0.1        0.1
+## 152  -0.4535 [   -2.5350;    1.6281]       0.0        0.0
+## 153   0.4023 [   -0.6937;    1.4983]       0.1        0.1
+## 154  -0.3673 [   -1.1203;    0.3857]       0.3        0.3
+## 155   0.8653 [   -1.7219;    3.4524]       0.0        0.0
+## 156   0.3957 [   -2.3888;    3.1802]       0.0        0.0
+## 157  -0.0549 [   -0.3349;    0.2250]       2.1        2.1
+## 158   0.1213 [   -0.2708;    0.5133]       1.1        1.1
+## 159  -0.3176 [   -1.9597;    1.3246]       0.1        0.1
+## 160   0.8253 [   -1.7576;    3.4083]       0.0        0.0
+## 161  -0.2939 [   -1.2085;    0.6207]       0.2        0.2
+## 162   1.1080 [   -1.0559;    3.2719]       0.0        0.0
+## 163   0.5885 [   -0.2880;    1.4650]       0.2        0.2
+## 164   1.0076 [   -2.7408;    4.7559]       0.0        0.0
+## 165  -0.3301 [   -1.0940;    0.4338]       0.3        0.3
+## 166  -5.6677 [  -89.9389;   78.6036]       0.0        0.0
+## 167  -0.1994 [   -1.9929;    1.5940]       0.1        0.1
+## 168  -0.1490 [   -0.9616;    0.6636]       0.2        0.2
+## 169  -0.0589 [   -0.4705;    0.3527]       1.0        1.0
+## 170  -0.2485 [   -1.4073;    0.9102]       0.1        0.1
+## 171  -1.5823 [  -12.0924;    8.9277]       0.0        0.0
+## 172  -0.3685 [   -1.3735;    0.6366]       0.2        0.2
+## 173   0.0022 [   -0.3911;    0.3956]       1.1        1.1
+## 174   0.0476 [   -0.6444;    0.7397]       0.3        0.3
+## 175  -0.3434 [   -1.5079;    0.8211]       0.1        0.1
+## 176   0.1909 [   -2.5582;    2.9401]       0.0        0.0
+## 177  -0.1409 [   -0.8268;    0.5450]       0.3        0.3
+## 178  -0.6238 [   -4.8473;    3.5997]       0.0        0.0
+## 179   0.0064 [   -0.1931;    0.2058]       4.1        4.1
+## 180   0.5622 [   -1.2629;    2.3874]       0.0        0.0
+## 181   1.7593 [  -16.4448;   19.9633]       0.0        0.0
+## 182   0.7186 [   -0.8254;    2.2625]       0.1        0.1
+## 183   0.5153 [   -0.2543;    1.2848]       0.3        0.3
+## 184   0.0089 [   -7.5867;    7.6046]       0.0        0.0
+## 185  -0.0819 [   -1.7230;    1.5592]       0.1        0.1
+## 186  -0.2065 [   -3.1407;    2.7276]       0.0        0.0
+## 187  -0.9262 [   -5.9184;    4.0660]       0.0        0.0
+## 188  -0.2179 [   -1.5314;    1.0956]       0.1        0.1
+## 189  -0.1473 [   -0.7255;    0.4308]       0.5        0.5
+## 190   0.4698 [   -0.0338;    0.9733]       0.6        0.6
+## 191   1.4463 [   -8.9871;   11.8797]       0.0        0.0
+## 192  -0.4598 [   -1.3840;    0.4644]       0.2        0.2
+## 193   0.0469 [   -0.3291;    0.4230]       1.2        1.2
+## 194  -0.4861 [   -4.9370;    3.9648]       0.0        0.0
+## 195   0.1392 [   -0.2833;    0.5618]       0.9        0.9
+## 196   0.6854 [   -0.4793;    1.8500]       0.1        0.1
+## 197  -2.3101 [  -12.7926;    8.1725]       0.0        0.0
+## 198  -0.2884 [   -2.0363;    1.4596]       0.1        0.1
+## 199   0.8201 [   -2.0613;    3.7015]       0.0        0.0
+## 200  -0.0668 [   -0.4726;    0.3389]       1.0        1.0
+## 201   1.9579 [  -16.7051;   20.6209]       0.0        0.0
+## 202  -0.7458 [   -2.1730;    0.6814]       0.1        0.1
+## 203  -0.1808 [   -1.2285;    0.8669]       0.1        0.1
+## 204   0.7101 [   -1.1905;    2.6107]       0.0        0.0
+## 205  -0.1365 [   -1.2616;    0.9886]       0.1        0.1
+## 206  -0.1786 [   -1.6820;    1.3248]       0.1        0.1
+## 207   0.9131 [   -2.2230;    4.0492]       0.0        0.0
+## 208  -0.5896 [   -2.2169;    1.0377]       0.1        0.1
+## 209   0.0118 [   -1.2911;    1.3148]       0.1        0.1
+## 210   1.7701 [   -6.7094;   10.2496]       0.0        0.0
+## 211   7.0977 [ -129.4392;  143.6345]       0.0        0.0
+## 212   0.5064 [   -1.8346;    2.8473]       0.0        0.0
+## 213  -0.4674 [   -1.8793;    0.9446]       0.1        0.1
+## 214  -0.7799 [   -5.2185;    3.6587]       0.0        0.0
+## 215   0.1563 [   -0.4808;    0.7933]       0.4        0.4
+## 216  -0.2155 [   -1.0086;    0.5777]       0.3        0.3
+## 217   0.1901 [   -0.3340;    0.7141]       0.6        0.6
+## 218   0.1720 [   -0.1160;    0.4599]       2.0        2.0
+## 219  -0.0673 [   -0.7924;    0.6577]       0.3        0.3
+## 220   0.0539 [   -0.6893;    0.7970]       0.3        0.3
+## 221  -1.0564 [   -5.2589;    3.1460]       0.0        0.0
+## 222  -0.4208 [   -1.5661;    0.7246]       0.1        0.1
+## 223   0.0762 [   -2.7280;    2.8804]       0.0        0.0
+## 224  -0.0285 [   -1.3987;    1.3416]       0.1        0.1
+## 225  -0.0512 [   -1.0910;    0.9887]       0.2        0.2
+## 226   0.1455 [   -3.1824;    3.4735]       0.0        0.0
+## 227 -18.6690 [-1223.1547; 1185.8168]       0.0        0.0
+## 228   8.0430 [  -87.7072;  103.7931]       0.0        0.0
+## 229  -0.1572 [   -1.0105;    0.6961]       0.2        0.2
+## 230   0.1280 [   -0.6700;    0.9261]       0.3        0.3
+## 231   0.1623 [   -4.5116;    4.8363]       0.0        0.0
+## 232   0.0657 [   -0.4552;    0.5865]       0.6        0.6
+## 233  -1.0959 [   -2.6584;    0.4666]       0.1        0.1
+## 234   0.0908 [   -1.5391;    1.7208]       0.1        0.1
+## 235  32.3883 [-3457.0555; 3521.8321]       0.0        0.0
+## 236  -2.4121 [  -20.7605;   15.9362]       0.0        0.0
+## 237  -1.8826 [   -7.1715;    3.4064]       0.0        0.0
+## 238   0.2595 [   -0.2298;    0.7487]       0.7        0.7
+## 239  -0.0544 [   -1.7647;    1.6559]       0.1        0.1
+## 240  -2.3071 [  -95.9582;   91.3440]       0.0        0.0
+## 241   0.5862 [   -0.1251;    1.2974]       0.3        0.3
+## 242   0.2744 [   -2.8971;    3.4458]       0.0        0.0
+## 243  -0.6283 [   -1.7057;    0.4491]       0.1        0.1
+## 244   1.2097 [  -15.9890;   18.4084]       0.0        0.0
+## 245  -1.3777 [   -7.9461;    5.1906]       0.0        0.0
+## 246   0.0645 [   -0.4361;    0.5652]       0.7        0.7
+## 247   0.0423 [   -0.6766;    0.7611]       0.3        0.3
+## 248   1.4153 [   -8.0826;   10.9132]       0.0        0.0
+## 249  -0.2968 [   -1.6347;    1.0411]       0.1        0.1
+## 250  -0.1699 [   -1.0676;    0.7278]       0.2        0.2
+## 251   0.0999 [   -0.2856;    0.4854]       1.1        1.1
+## 252   0.3024 [   -3.2525;    3.8573]       0.0        0.0
+## 253  -0.1766 [   -1.4667;    1.1135]       0.1        0.1
+## 254  -2.4200 [  -15.5425;   10.7025]       0.0        0.0
+## 255   0.2862 [   -0.6657;    1.2380]       0.2        0.2
+## 256   0.0130 [   -2.3056;    2.3315]       0.0        0.0
+## 257   1.0448 [   -1.7435;    3.8332]       0.0        0.0
+## 258  -0.2131 [   -5.6989;    5.2727]       0.0        0.0
+## 259  -0.3202 [   -0.7593;    0.1190]       0.8        0.8
+## 260   2.7839 [  -27.4594;   33.0272]       0.0        0.0
+## 261  -0.3359 [   -0.9578;    0.2860]       0.4        0.4
+## 262  -0.2420 [   -1.2514;    0.7673]       0.2        0.2
+## 263  -0.3237 [   -2.1440;    1.4965]       0.0        0.0
+## 264  -1.9619 [  -25.1735;   21.2497]       0.0        0.0
+## 265  -0.1023 [   -1.2887;    1.0841]       0.1        0.1
+## 266   0.0162 [   -0.2926;    0.3250]       1.7        1.7
+## 267   0.3517 [   -0.2359;    0.9394]       0.5        0.5
+## 268  20.3466 [-1202.8674; 1243.5605]       0.0        0.0
+## 269  -0.0254 [   -0.3853;    0.3345]       1.3        1.3
+## 270 -13.4687 [ -278.9625;  252.0251]       0.0        0.0
+## 271  -0.0001 [   -0.4197;    0.4195]       0.9        0.9
+## 272  -0.3180 [   -0.9701;    0.3341]       0.4        0.4
+## 273  -0.3831 [   -1.1349;    0.3688]       0.3        0.3
+## 274   1.1599 [   -3.2998;    5.6197]       0.0        0.0
+## 275   0.0855 [   -0.6929;    0.8640]       0.3        0.3
+## 276   0.2167 [   -1.0471;    1.4805]       0.1        0.1
+## 277   0.1733 [   -0.2710;    0.6176]       0.8        0.8
+## 278   0.0622 [   -0.5924;    0.7168]       0.4        0.4
+## 279   4.4693 [  -54.0935;   63.0320]       0.0        0.0
+## 280   0.5762 [   -0.8440;    1.9964]       0.1        0.1
+## 281  -0.0670 [   -0.7505;    0.6165]       0.3        0.3
+## 282   0.3404 [   -0.1792;    0.8600]       0.6        0.6
+## 283   0.3796 [   -1.3174;    2.0765]       0.1        0.1
+## 284   0.9827 [   -0.7483;    2.7137]       0.1        0.1
+## 285   0.2535 [   -2.9211;    3.4282]       0.0        0.0
+## 286  -1.5908 [  -12.2619;    9.0802]       0.0        0.0
+## 287  -0.6621 [   -8.8562;    7.5319]       0.0        0.0
+## 288  -0.8188 [   -3.5661;    1.9284]       0.0        0.0
+## 289  -0.6807 [   -1.7936;    0.4323]       0.1        0.1
+## 290   0.1011 [   -2.8944;    3.0966]       0.0        0.0
+## 291  -0.3060 [   -1.6320;    1.0199]       0.1        0.1
+## 292   4.5673 [ -138.4229;  147.5575]       0.0        0.0
+## 293  -0.2010 [   -0.7874;    0.3854]       0.5        0.5
+## 294  -0.6822 [   -2.4865;    1.1220]       0.1        0.1
+## 295   0.0196 [   -0.7574;    0.7965]       0.3        0.3
+## 296   0.6603 [   -0.1996;    1.5202]       0.2        0.2
+## 297   0.6042 [   -2.1326;    3.3411]       0.0        0.0
+## 298   0.3666 [   -0.2533;    0.9865]       0.4        0.4
+## 299  -0.5027 [   -1.7884;    0.7831]       0.1        0.1
+## 300  -0.5359 [   -5.6153;    4.5436]       0.0        0.0
+## 301   0.1011 [   -0.3815;    0.5836]       0.7        0.7
+## 302   0.4273 [   -0.4636;    1.3183]       0.2        0.2
+## 303   0.9766 [   -2.1448;    4.0981]       0.0        0.0
+## 304   0.5021 [   -0.3701;    1.3743]       0.2        0.2
+## 305   6.3943 [  -90.0609;  102.8495]       0.0        0.0
+## 306  -8.7365 [ -692.2800;  674.8071]       0.0        0.0
+## 307  -0.1323 [   -1.3268;    1.0622]       0.1        0.1
+## 308   0.2265 [   -0.2025;    0.6556]       0.9        0.9
+## 309  -0.9000 [   -4.3098;    2.5098]       0.0        0.0
+## 310  -0.2346 [   -0.8522;    0.3829]       0.4        0.4
+## 311   0.7962 [   -1.8364;    3.4288]       0.0        0.0
+## 312   0.2614 [   -0.8001;    1.3229]       0.1        0.1
+## 313  -0.2299 [   -1.4285;    0.9687]       0.1        0.1
+## 314  -0.0973 [   -0.7066;    0.5119]       0.4        0.4
+## 315   0.2052 [   -0.2830;    0.6934]       0.7        0.7
+## 316   0.2341 [   -0.3789;    0.8471]       0.4        0.4
+## 317  -0.1058 [   -0.4834;    0.2719]       1.1        1.1
+## 318   3.4583 [  -15.4617;   22.3784]       0.0        0.0
+## 319  -0.9138 [  -12.8378;   11.0101]       0.0        0.0
+## 320   1.9225 [   -7.7477;   11.5926]       0.0        0.0
+## 321   0.6561 [   -2.0689;    3.3812]       0.0        0.0
+## 322   0.9525 [   -2.8928;    4.7979]       0.0        0.0
+## 323   0.6078 [   -1.5097;    2.7253]       0.0        0.0
+## 324  -0.1767 [   -1.1409;    0.7874]       0.2        0.2
+## 325  -0.4160 [   -3.6681;    2.8361]       0.0        0.0
+## 326   0.1523 [   -0.8010;    1.1055]       0.2        0.2
+## 327   0.6956 [   -0.8286;    2.2198]       0.1        0.1
+## 328   0.5427 [   -0.5106;    1.5960]       0.1        0.1
+## 329   0.6194 [   -1.0475;    2.2863]       0.1        0.1
+## 330   0.4156 [   -0.2761;    1.1074]       0.3        0.3
+## 331  -0.1593 [   -1.1454;    0.8267]       0.2        0.2
+## 332   0.3389 [   -0.6673;    1.3450]       0.2        0.2
+## 333  -0.0802 [   -1.0494;    0.8891]       0.2        0.2
+## 334   0.1678 [   -0.2934;    0.6289]       0.8        0.8
+## 335  -0.4662 [   -1.2675;    0.3350]       0.3        0.3
+## 336   0.4181 [   -0.3372;    1.1734]       0.3        0.3
+## 337   0.0872 [   -0.6100;    0.7844]       0.3        0.3
+## 338   0.1761 [   -8.5278;    8.8801]       0.0        0.0
+## 339  18.9503 [-1169.2400; 1207.1406]       0.0        0.0
+## 340   0.0225 [   -0.5709;    0.6160]       0.5        0.5
+## 341  -0.5399 [   -8.4521;    7.3723]       0.0        0.0
+## 342   0.1205 [   -0.7702;    1.0112]       0.2        0.2
+## 343  -0.2040 [   -0.6307;    0.2226]       0.9        0.9
+## 344   0.3316 [   -0.1999;    0.8632]       0.6        0.6
+## 345  -0.3114 [   -0.7491;    0.1263]       0.9        0.9
+## 346   1.0143 [   -0.6751;    2.7038]       0.1        0.1
+## 347   0.2458 [   -0.6408;    1.1324]       0.2        0.2
+## 348   0.2114 [   -0.7902;    1.2130]       0.2        0.2
+## 349   0.1390 [   -0.2266;    0.5046]       1.2        1.2
+## 350  -2.3510 [  -27.4344;   22.7323]       0.0        0.0
+## 351   1.1358 [   -4.4365;    6.7080]       0.0        0.0
+## 352  -3.5158 [  -53.3737;   46.3421]       0.0        0.0
+## 353  -0.4080 [   -1.0688;    0.2528]       0.4        0.4
+## 354   1.0172 [  -10.7524;   12.7868]       0.0        0.0
+## 355   0.0610 [   -0.3386;    0.4605]       1.0        1.0
+## 356   0.1568 [   -0.7318;    1.0454]       0.2        0.2
+## 357  -0.6280 [   -3.0542;    1.7981]       0.0        0.0
+## 358  -1.1786 [   -4.5426;    2.1855]       0.0        0.0
+## 359  -0.1084 [   -2.5575;    2.3406]       0.0        0.0
+## 360   0.2533 [   -0.8195;    1.3261]       0.1        0.1
+## 361  -0.0107 [   -0.6029;    0.5816]       0.5        0.5
+## 362   0.3983 [   -0.2024;    0.9989]       0.5        0.5
+## 363  -0.0656 [   -0.7208;    0.5896]       0.4        0.4
+## 364  -0.0161 [   -0.7816;    0.7495]       0.3        0.3
+## 365   1.8321 [   -5.3575;    9.0216]       0.0        0.0
+## 366  -0.1171 [   -0.7551;    0.5209]       0.4        0.4
+## 367   3.6881 [ -143.3845;  150.7607]       0.0        0.0
+## 368   0.0290 [   -1.2882;    1.3462]       0.1        0.1
+## 369  -0.5197 [   -2.0411;    1.0017]       0.1        0.1
+## 370  -0.3445 [   -2.4130;    1.7240]       0.0        0.0
+## 371   0.3863 [   -0.4155;    1.1881]       0.3        0.3
+## 372   0.1226 [   -0.8689;    1.1142]       0.2        0.2
+## 373   0.0400 [   -0.3255;    0.4054]       1.2        1.2
+## 374   0.0450 [   -0.2367;    0.3267]       2.1        2.1
+## 375   0.5231 [   -0.2856;    1.3317]       0.2        0.2
+## 376  -0.5730 [   -1.9656;    0.8196]       0.1        0.1
+## 377  -3.6413 [  -26.6863;   19.4036]       0.0        0.0
+## 378  -0.2275 [   -1.3200;    0.8650]       0.1        0.1
+## 379  -5.4269 [  -79.5314;   68.6776]       0.0        0.0
+## 380  -0.3988 [   -1.6867;    0.8891]       0.1        0.1
+## 381   6.0158 [ -463.0079;  475.0396]       0.0        0.0
+## 382  -0.8848 [   -8.3352;    6.5656]       0.0        0.0
+## 383  -0.0283 [   -0.7512;    0.6947]       0.3        0.3
+## 384  -3.7743 [  -69.9498;   62.4011]       0.0        0.0
+## 385  -0.8813 [   -3.3455;    1.5828]       0.0        0.0
+## 
+## Number of studies combined: k = 385
+## 
+##                                        95%-CI    z p-value
+## Fixed effect model   0.0281 [-0.0123; 0.0685] 1.36  0.1729
+## Random effects model 0.0281 [-0.0123; 0.0685] 1.36  0.1729
+## 
+## Quantifying heterogeneity:
+## tau^2 = 0; H = 1.00 [1.00; 1.00]; I^2 = 0.0% [0.0%; 0.0%]
+## 
+## Test of heterogeneity:
+##       Q d.f. p-value
+##  142.55  384  1.0000
+## 
+## Details on meta-analytical method:
+## - Inverse variance method
+## - DerSimonian-Laird estimator for tau^2</code></pre>
+<pre class="r"><code>mr_ivw(DiD$sbx, DiD$sby, DiD$ssex, DiD$ssey)</code></pre>
+<pre><code>## $b
+## [1] 0.008135218
+## 
+## $se
+## [1] 0.01934216
+## 
+## $pval
+## [1] 0.6740507
+## 
+## $nsnp
+## [1] 385
+## 
+## $Q
+## [1] 430.4995
+## 
+## $Q_df
+## [1] 384
+## 
+## $Q_pval
+## [1] 0.05066714</code></pre>
+</div>
 
 
 
