@@ -130,7 +130,7 @@ $(document).ready(function () {
     library(plm)
     library(knitr)
 }))
-opts_chunk$set(warning=FALSE, cache=TRUE, echo=TRUE)</code></pre>
+opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=TRUE)</code></pre>
 <div id="simulations-to-see-if-did-and-plm-give-the-same-estimates" class="section level2">
 <h2>Simulations to see if DiD and PLM give the same estimates</h2>
 <pre class="r"><code>n &lt;- 100000
@@ -153,17 +153,17 @@ dif &lt;- data_frame(
 )</code></pre>
 <p>Get the Wald ratio using DiD estimate:</p>
 <pre class="r"><code>coefficients(lm(y ~ g, dif))[2] / coefficients(lm(x ~ g, dif))[2]</code></pre>
-<pre><code>##       g 
-## 2.00138</code></pre>
+<pre><code>##        g 
+## 2.001698</code></pre>
 <p>Get the PLM estimate:</p>
 <pre class="r"><code>plm(y ~ x | g, data=dat, index=&quot;fam&quot;, model=&quot;within&quot;, inst.method=&quot;bvk&quot;)</code></pre>
 <pre><code>## 
 ## Model Formula: y ~ x | g
-## &lt;environment: 0x7020b38&gt;
+## &lt;environment: 0x31ec8e30&gt;
 ## 
 ## Coefficients:
 ##      x 
-## 2.0014</code></pre>
+## 2.0017</code></pre>
 <p>Note that DiD ran instantly but PLM took about 20 seconds</p>
 </div>
 <div id="compare-plm-and-did-in-ukbb-data" class="section level2">
@@ -388,7 +388,27 @@ for(i in 1:length(rsid))
     f &lt;- as.formula(paste0(&quot;out_height ~ eduyears2 | &quot;, rsid[i]))
     temp &lt;- plm(f, data=data_sibs, index=&quot;famid&quot;, model=&quot;within&quot;, inst.method=&quot;bvk&quot;) %&gt;% summary %&gt;% coefficients
     PLM[[i]] &lt;- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
-</code></pre>
+}</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex</code></pre>
 <pre class="r"><code>PLM &lt;- bind_rows(PLM)
 kable(PLM)</code></pre>
 <table>
@@ -568,6 +588,8 @@ for(i in 1:length(rsid_sig))
     f &lt;- as.formula(paste0(&quot;eduyears2 ~ out_height | &quot;, rsid_sig[i]))
     temp &lt;- plm(f, data=data_sibs, index=&quot;famid&quot;, model=&quot;within&quot;, inst.method=&quot;bvk&quot;) %&gt;% summary %&gt;% coefficients
     PLM[[i]] &lt;- data_frame(inst=rsid_sig[i], b = temp[1], se=temp[2], pval=temp[4])
+}</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex
 ## These series are constants and have been removed: born_english, sex
 ## These series are constants and have been removed: born_english, sex
 ## These series are constants and have been removed: born_english, sex
@@ -671,11 +693,395 @@ DiD$b &lt;- DiD$sby / DiD$sbx
 PLM &lt;- list()
 for(i in 1:length(rsid[1:385]))
 {
-    message(i, &quot; of &quot;, length(rsid))
     f &lt;- as.formula(paste0(&quot;eduyears2 ~ out_height | &quot;, rsid[i]))
     temp &lt;- plm(f, data=data_sibs, index=&quot;famid&quot;, model=&quot;within&quot;, inst.method=&quot;bvk&quot;) %&gt;% summary %&gt;% coefficients
     PLM[[i]] &lt;- data_frame(inst=rsid[i], b = temp[1], se=temp[2], pval=temp[4])
 }</code></pre>
+<pre><code>## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex
+## These series are constants and have been removed: born_english, sex</code></pre>
 <pre class="r"><code>PLM &lt;- bind_rows(PLM)
 
 cor(PLM$b, DiD$b)</code></pre>
@@ -1114,6 +1520,16 @@ cor(PLM$b[!index], DiD$b[!index])</code></pre>
 ## 
 ## $Q_pval
 ## [1] 0.05066714</code></pre>
+</div>
+<div id="final-thoughts" class="section level2">
+<h2>Final thoughts</h2>
+<p>When instruments are very strong the agreement between PLM and DiD is near perfect. That there are larger differences when using weak instruments indicates that the DiD method is likely not accounting for this appropriately, so the standard errors are liable to be associated with confounding for example.</p>
+<p>PLM however is extremely slow, making simulations somewhat prohibitive. Moving forwards we can</p>
+<ol style="list-style-type: decimal">
+<li>Use PLM for empirical analysis</li>
+<li>Show theoretically that it is equivalent to DiD in most scenarios</li>
+<li>Present simulations using DiD to illustrate the solution to the problem of dynastic effects, while explaining that in practice PLM is more appropriate.</li>
+</ol>
 </div>
 
 
