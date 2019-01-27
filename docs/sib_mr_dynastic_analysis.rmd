@@ -12,6 +12,7 @@ suppressPackageStartupMessages(library(knitr))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(gridExtra))
 opts_chunk$set(warning=FALSE, message=FALSE, cache=TRUE, echo=FALSE)
 
 ```
@@ -214,7 +215,7 @@ Plotting again with only hybrid, trio and standard for purpose of cleaner presen
 
 ```{r fig.cap="Null model. When confounding and dynastic effects are present then standard MR has very high false discovery rates. Similarly so for the S2 model also."}
 
-ggplot(subset(pow2, eff_xy == 0 & vargx == 0.1), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
+ggplot(subset(pow2, eff_xy == 0 & vargx == 0.05), aes(x=as.factor(n), y=pow, group=as.factor(test))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(eff_xu ~ eff_ux) +
@@ -260,6 +261,48 @@ labs(y="Bias (estimated effect - simulated effect)", x = "Simulated effect of x 
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 
 ```
+
+## Plots for paper
+
+
+
+```{r fig.cap="A: SNP-exposure r2 = 0.05; sample size = 10000; simulation involves an influence of parental exposure influencing child's confounder, which explains 10% of variance in child exposures and outcomes. When simulate causal efect = 0 expect FDR to be 0.05. B: Similar simulation as in (A) but allowing sample size to vary and fixing the causal effect of x on y to 1% of variance explained. Small amount of bias in family MR estimates until effect sizes get very large"}
+
+p1 <- ggplot(subset(pow2, eff_xy == 0 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=n, y=pow, group=as.factor(paste(test, eff_ux)))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(. ~ eff_xu) +
+scale_colour_brewer(type="qual") +
+geom_hline(yintercept=0.05, linetype="dotted") +
+labs(x="Sample size", y="FDR", colour="Method") +
+theme_bw() +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position="none")
+
+p2 <- ggplot(subset(pow2, n == 10000 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=eff_xy, y=pow, group=as.factor(paste(test, eff_ux)))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(. ~ eff_xu) +
+scale_colour_brewer(type="qual") +
+geom_hline(yintercept=0.05, linetype="dotted") +
+labs(title="A. Power and false discovery rates", x="Simulated causal effect", y="Discovery rate", colour="Method") +
+theme_bw() +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position = c(0.92, 0.33), legend.background = element_rect(linetype = "solid", size = 0.1, colour = 1))
+
+p3 <- ggplot(subset(pow2, eff_xy == 0.01 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=n, y=b-eff_xy, group=as.factor(paste(test, eff_ux)))) +
+geom_point(aes(colour=as.factor(test))) +
+geom_line(aes(colour=as.factor(test))) +
+facet_grid(. ~ eff_xu) +
+scale_colour_brewer(type="qual") +
+geom_hline(yintercept=0.0, linetype="dotted") +
+labs(title="B. Bias", x="Sample size", y="Bias (effect estimate - truth)", colour="Method") +
+theme_bw() +
+theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position="none")
+
+plot(arrangeGrob(p2, p3))
+ggsave("../images/simulation_figure.pdf", arrangeGrob(p2, p3), width=8.5, height=7)
+
+```
+
 
 ## False discovery rates
 
