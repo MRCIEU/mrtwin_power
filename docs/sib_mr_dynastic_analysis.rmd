@@ -284,7 +284,7 @@ geom_line(aes(colour=as.factor(test))) +
 facet_grid(. ~ eff_xu) +
 scale_colour_brewer(type="qual") +
 geom_hline(yintercept=0.05, linetype="dotted") +
-labs(title="A. Power and false discovery rates", x="Simulated causal effect", y="Discovery rate", colour="Method") +
+labs(title="A", x="Simulated causal effect", y="Power", colour="Method") +
 theme_bw() +
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position = c(0.92, 0.33), legend.background = element_rect(linetype = "solid", size = 0.1, colour = 1))
 
@@ -294,7 +294,7 @@ geom_line(aes(colour=as.factor(test))) +
 facet_grid(. ~ eff_xu) +
 scale_colour_brewer(type="qual") +
 geom_hline(yintercept=0.0, linetype="dotted") +
-labs(title="B. Bias", x="Sample size", y="Bias (effect estimate - truth)", colour="Method") +
+labs(title="B", x="Sample size", y="Bias (effect estimate - truth)", colour="Method") +
 theme_bw() +
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position="none")
 
