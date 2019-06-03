@@ -245,16 +245,16 @@ vh_regression <- function(bS, bD, seS, seD, n)
 	return(d)
 }
 
-do_mr_wf <- function(x1, x2, y1, y2, ibd)
-{
-	dmodx <- gwas((x1-x2)^2, ibd)
-	dmody <- gwas((y1-y2)^2, ibd)
-	smodx <- gwas((x1+x2)^2, ibd)
-	smody <- gwas((y1+y2)^2, ibd)
-	vhx <- vh_regression(smodx$bhat, dmodx$bhat, smodx$se, dmodx$se, length(x1))
-	vhy <- vh_regression(smody$bhat, dmody$bhat, smody$se, dmody$se, length(y1))
-	return(mr_ivw(vhx[,1], vhy[,1], sqrt(vhx[,2]), sqrt(vhy[,2])))
-}
+# do_mr_wf <- function(x1, x2, y1, y2, ibd)
+# {
+# 	dmodx <- gwas((x1-x2)^2, ibd)
+# 	dmody <- gwas((y1-y2)^2, ibd)
+# 	smodx <- gwas((x1+x2)^2, ibd)
+# 	smody <- gwas((y1+y2)^2, ibd)
+# 	vhx <- vh_regression(smodx$bhat, dmodx$bhat, smodx$se, dmodx$se, length(x1))
+# 	vhy <- vh_regression(smody$bhat, dmody$bhat, smody$se, dmody$se, length(y1))
+# 	return(mr_ivw(vhx[,1], vhy[,1], sqrt(vhx[,2]), sqrt(vhy[,2])))
+# }
 
 
 do_mr_pop_wf <- function(fam, phen)
@@ -335,7 +335,7 @@ do_mr_trio <- function(fam, phen)
 }
 
 
-do_mr_ff <- function(fam, phen)
+do_mr_random <- function(fam, phen)
 {
 	require(lme4)
 	nsnp <- ncol(fam$dads)
@@ -346,10 +346,34 @@ do_mr_ff <- function(fam, phen)
 	ff <- as.factor(rep(1:length(phen$sibs1$x), times=2))
 	for(i in 1:nsnp)
 	{
+		message("SNP ", i, " of ", nsnp)
 		mod <- summary(lmer(c(phen$sibs1$x, phen$sibs2$x) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + (1|ff)))$coefficients
 		bx[i] <- mod[2,1]
 		sex[i] <- mod[2,2]
 		mod <- summary(lmer(c(phen$sibs1$y, phen$sibs2$y) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + (1|ff)))$coefficients
+		by[i] <- mod[2,1]
+		sey[i] <- mod[2,2]
+	}
+	return(mr_ivw(bx, by, sex, sey))
+}
+
+
+do_mr_fixed <- function(fam, phen)
+{
+	require(lme4)
+	nsnp <- ncol(fam$dads)
+	bx <- rep(NA, nsnp)
+	by <- rep(NA, nsnp)
+	sex <- rep(NA, nsnp)
+	sey <- rep(NA, nsnp)
+	ff <- as.factor(rep(1:length(phen$sibs1$x), times=2))
+	for(i in 1:nsnp)
+	{
+		message("SNP ", i, " of ", nsnp)
+		mod <- summary(lm(c(phen$sibs1$x, phen$sibs2$x) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + ff))$coefficients
+		bx[i] <- mod[2,1]
+		sex[i] <- mod[2,2]
+		mod <- summary(lm(c(phen$sibs1$y, phen$sibs2$y) ~ c(fam$sibs1[,i], fam$sibs2[,i]) + ff))$coefficients
 		by[i] <- mod[2,1]
 		sey[i] <- mod[2,2]
 	}
