@@ -13,9 +13,9 @@ def file_len(fname):
     return i + 1
 
 NSIM = file_len("../results/sib_mr_dynastic_parameters.txt") - 1
-SPLITS = 3000
-SIM = list(range(1, ceil(NSIM/SPLITS)+1))
-
+nsplit = 500
+SPLITS = list(range(1,nsplit+1))
+print("Sims per split: "+str(ceil(NSIM/nsplit)))
 
 
 rule all:
@@ -34,13 +34,13 @@ echo $HOSTNAME
 Rscript sib_mr_dynastic.r \
 ../results/sib_mr_dynastic_parameters.txt \
 {wildcards.sim} \
-{SPLITS} \
+{nsplit} \
 ../results/scratch/sib_mr_dynastic_{wildcards.sim}
 		"""
 
 rule aggregate:
 	input:
-		expand("../results/scratch/sib_mr_dynastic_{sim}", sim=SIM)
+		expand("../results/scratch/sib_mr_dynastic_{sim}", sim=SPLITS)
 	output:
 		"../results/sib_mr_dynastic.rdata"
 	shell:

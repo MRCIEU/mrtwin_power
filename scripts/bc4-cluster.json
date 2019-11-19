@@ -1,0 +1,26 @@
+{
+	"__default__" :
+	{
+		"name": "{rule}.{wildcards.sim}",
+		"partition": "mrcieu",
+		"nodes": "1",
+		"ncpu": "1",
+		"ntask": "1",
+		"time": "10:00:00",
+		"mem": "16G",
+		"output": "job_reports/{rule}.{wildcards.sim}.out"
+	},
+
+	"aggregate" :
+	{
+		"name": "{rule}",
+		"output": "job_reports/{rule}.out"
+	},
+
+	"report" :
+	{
+		"name": "{rule}",
+		"output": "job_reports/{rule}.out"
+	}
+
+}
