@@ -1,0 +1,60 @@
+# Generate parameters
+import subprocess
+from math import ceil
+
+subprocess.call("mkdir -p ../data", shell=True)
+subprocess.call("mkdir -p ../results/scratch", shell=True)
+subprocess.call("Rscript --vanilla sib_mr_dynastic_parameters.r 123456 ../results/sib_mr_dynastic_parameters.txt", shell=True)
+
+def file_len(fname):
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
+NSIM = file_len("../results/sib_mr_dynastic_parameters.txt") - 1
+SPLITS = 3000
+SIM = list(range(1, ceil(NSIM/SPLITS)+1))
+
+
+
+rule all:
+	input:
+		"../docs/sib_mr_dynastic_analysis.html"
+
+
+rule sim:
+	input:
+		"../results/sib_mr_dynastic_parameters.txt"
+	output:
+		"../results/scratch/sib_mr_dynastic_{sim}"
+	shell:
+		"""
+echo $HOSTNAME
+Rscript sib_mr_dynastic.r \
+../results/sib_mr_dynastic_parameters.txt \
+{wildcards.sim} \
+{SPLITS} \
+../results/scratch/sib_mr_dynastic_{wildcards.sim}
+		"""
+
+rule aggregate:
+	input:
+		expand("../results/scratch/sib_mr_dynastic_{sim}", sim=SIM)
+	output:
+		"../results/sib_mr_dynastic.rdata"
+	shell:
+		"""
+echo $HOSTNAME
+Rscript sib_mr_dynastic_aggregate.r
+		"""
+
+
+rule report:
+	input:
+		"../results/sib_mr_dynastic.rdata"
+	output:
+		"../docs/sib_mr_dynastic_analysis.html"
+	shell:
+		"Rscript -e \"rmarkdown::render('../docs/sib_mr_dynastic_analysis.rmd', output_format='all')\""
+

@@ -295,7 +295,7 @@ do_mr_wf <- function(fam, phen, method="diff")
 		{
 			sdiffgx <- fam$sibs1[,i] - fam$sibs2[,i]
 		} else {
-			sdiffgx <- fam[[meth]][,i]
+			sdiffgx <- fam[[method]][,i]
 		}
 		sdiffx <- phen$sibs1$x - phen$sibs2$x
 		# mod <- summary(lm(sdiffx ~ sdiffgx))

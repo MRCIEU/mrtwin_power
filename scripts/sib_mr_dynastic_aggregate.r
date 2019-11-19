@@ -1,14 +1,15 @@
+library(dplyr)
+fn <- list.files("../results/scratch/") %>% 
+	grep("sib_mr_dynastic", ., value=TRUE) %>% 
+	file.path("..", "results", "scratch", .)
+
 l <- list()
-for(i in 1:100)
+for(i in 1:length(fn))
 {
-	if(file.exists(paste0("../results/sib_dynastic_", i, ".rdata")))
-	{
-		load(paste0("../results/sib_dynastic_", i, ".rdata"))
-		l[[i]] <- res
-	}
-	else { message(i)}
+	load(fn[i])
+	l[[i]] <- res
 }
 
 dat <- plyr::rbind.fill(l)
-save(dat, file="../results/sib_dynastic.rdata")
+save(dat, file="../results/sib_mr_dynastic.rdata")
 
