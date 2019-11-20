@@ -20,12 +20,14 @@ print("Sims per split: "+str(ceil(NSIM/nsplit)))
 
 rule all:
 	input:
+		expand("../results/scratch/sib_mr_dynastic_{sim}", sim=SPLITS),
+		"../results/sib_mr_dynastic.rdata",
 		"../docs/sib_mr_dynastic_analysis.html"
 
 
 rule sim:
-	input:
-		"../results/sib_mr_dynastic_parameters.txt"
+	# input:
+	# 	"../results/sib_mr_dynastic_parameters.txt"
 	output:
 		"../results/scratch/sib_mr_dynastic_{sim}"
 	shell:
@@ -56,5 +58,7 @@ rule report:
 	output:
 		"../docs/sib_mr_dynastic_analysis.html"
 	shell:
-		"Rscript -e \"rmarkdown::render('../docs/sib_mr_dynastic_analysis.rmd', output_format='all')\""
+		"""
+Rscript -e "rmarkdown::render('../docs/sib_mr_dynastic_analysis.rmd', output_format='all')"
+		"""
 

@@ -45,18 +45,21 @@ for(i in 1:nrow(param))
 		sqrt(param$eff_ux[i]),
 		sqrt(param$eff_xu[i])
 	)
-	right <- rbind(
+	right <- try(rbind(
 		as.data.frame(do_mr_standard(p$sibs1$x, p$sibs1$y, d$sibs1)),
 		as.data.frame(do_mr_standard((p$sibs1$x - p$sibs2$x)^2, (p$sibs1$y - p$sibs2$y)^2, d[[param$gen[i]]])),
 		as.data.frame(do_mr_standard((p$sibs1$x + p$sibs2$x)^2, (p$sibs1$y + p$sibs2$y)^2, d[[param$gen[i]]])),
 		as.data.frame(do_mr_wf(d, p, param$gen[i])),
 		as.data.frame(do_mr_pop_wf(d, p)),
 		as.data.frame(do_mr_trio(d, p))
-	)
-	right$test <- 1:nrow(right)
-	right$model <- "dynastic"
-	left <- param[rep(i, nrow(right)), ]
-	res[[i]] <- cbind(left, right)
+	))
+	if(class(right) != "try-error")
+	{
+		right$test <- 1:nrow(right)
+		right$model <- "dynastic"
+		left <- param[rep(i, nrow(right)), ]
+		res[[i]] <- cbind(left, right)
+	}
 }
 
 res <- bind_rows(res)

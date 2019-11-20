@@ -4,8 +4,10 @@ fn <- list.files("../results/scratch/") %>%
 	file.path("..", "results", "scratch", .)
 
 l <- list()
+message(length(fn))
 for(i in 1:length(fn))
 {
+	message(i)
 	load(fn[i])
 	l[[i]] <- res
 }

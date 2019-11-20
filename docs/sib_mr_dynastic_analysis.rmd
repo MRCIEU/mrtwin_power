@@ -117,7 +117,7 @@ All estimates based on $V_{GX} = 0.1$ and 90 independent causal variants (i.e. s
 
 ```{r }
 
-load("../results/sib_dynastic.rdata")
+load("../results/sib_mr_dynastic.rdata")
 
 dat$test <- as.factor(dat$test)
 levels(dat$test) <- c("Unrelated", "D2 ~ IBD", "S2 ~ IBD", "VH model", "Siblings", "Trios")
