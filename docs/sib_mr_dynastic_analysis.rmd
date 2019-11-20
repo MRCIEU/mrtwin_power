@@ -130,16 +130,16 @@ Is there a difference in method performance based on whether IBD, IBS or unweigh
 
 ```{r}
 # IBD, IBS, IBS_unw
-dat$sig <- dat$pval < 0.05
-group_by(dat, test, eff_xy == 0) %>% summarise(
-	sig = summary(lm(sig ~ gen))$coef[2,4]
-) %>% kable
+# dat$sig <- dat$pval < 0.05
+# group_by(dat, test, eff_xy == 0) %>% summarise(
+	# sig = summary(lm(sig ~ gen))$coef[2,4]
+# ) %>% kable
 
 ```
 
 ```{r}
 
-pow <- filter(dat) %>% group_by(n, vargx, eff_xy, eff_ux, eff_xu, model, test) %>%
+pow <- filter(dat) %>% group_by(n, vargx, eff_xy, eff_ux, eff_xu, model, test, gen) %>%
 	dplyr::summarise(
 		se=sd(b, na.rm=TRUE),
 		b=mean(b, na.rm=TRUE),
@@ -268,7 +268,7 @@ theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
 
 ```{r fig.cap="A: SNP-exposure r2 = 0.05; sample size = 10000; simulation involves an influence of parental exposure influencing child's confounder, which explains 10% of variance in child exposures and outcomes. When simulate causal efect = 0 expect FDR to be 0.05. B: Similar simulation as in (A) but allowing sample size to vary and fixing the causal effect of x on y to 1% of variance explained. Small amount of bias in family MR estimates until effect sizes get very large"}
 
-p1 <- ggplot(subset(pow2, eff_xy == 0 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=n, y=pow, group=as.factor(paste(test, eff_ux)))) +
+p1 <- ggplot(subset(pow2, eff_xy == 0 & vargx == 0.05 & eff_ux == "Confounder = 0.1" & gen == "ibs_unw"), aes(x=n, y=pow, group=as.factor(paste(test, eff_ux)))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(. ~ eff_xu) +
@@ -278,7 +278,7 @@ labs(x="Sample size", y="FDR", colour="Method") +
 theme_bw() +
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position="none")
 
-p2 <- ggplot(subset(pow2, n == 10000 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=eff_xy, y=pow, group=as.factor(paste(test, eff_ux)))) +
+p2 <- ggplot(subset(pow2, n == 10000 & vargx == 0.05 & eff_ux == "Confounder = 0.1" & gen == "ibs_unw"), aes(x=eff_xy, y=pow, group=as.factor(paste(test, eff_ux)))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(. ~ eff_xu) +
@@ -288,7 +288,7 @@ labs(title="A", x="Simulated causal effect", y="Power", colour="Method") +
 theme_bw() +
 theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5), legend.position = c(0.92, 0.33), legend.background = element_rect(linetype = "solid", size = 0.1, colour = 1))
 
-p3 <- ggplot(subset(pow2, eff_xy == 0.01 & vargx == 0.05 & eff_ux == "Confounder = 0.1"), aes(x=n, y=b-eff_xy, group=as.factor(paste(test, eff_ux)))) +
+p3 <- ggplot(subset(pow2, eff_xy == 0.01 & vargx == 0.05 & eff_ux == "Confounder = 0.1" & gen == "ibs_unw"), aes(x=n, y=b-eff_xy, group=as.factor(paste(test, eff_ux)))) +
 geom_point(aes(colour=as.factor(test))) +
 geom_line(aes(colour=as.factor(test))) +
 facet_grid(. ~ eff_xu) +
