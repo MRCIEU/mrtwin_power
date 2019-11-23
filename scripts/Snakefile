@@ -13,7 +13,7 @@ def file_len(fname):
     return i + 1
 
 NSIM = file_len("../results/sib_mr_dynastic_parameters.txt") - 1
-nsplit = 500
+nsplit = 800
 SPLITS = list(range(1,nsplit+1))
 print("Sims per split: "+str(ceil(NSIM/nsplit)))
 
@@ -26,8 +26,8 @@ rule all:
 
 
 rule sim:
-	# input:
-	# 	"../results/sib_mr_dynastic_parameters.txt"
+	input:
+#		"../results/sib_mr_dynastic_parameters.txt"
 	output:
 		"../results/scratch/sib_mr_dynastic_{sim}"
 	shell:
