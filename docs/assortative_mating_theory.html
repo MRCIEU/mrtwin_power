@@ -457,59 +457,64 @@ create_child &lt;- function(dat, bgx, bgy, bxy, bux, buy)
     return(dat)
 }</code></pre>
 <p>Run the simulation:</p>
-<pre class="r"><code>rho &lt;- 0.8
-dat &lt;- generate_individuals(n=1000000, maf=0.5, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+<pre class="r"><code>bgx &lt;- 0.01
+bgy &lt;- 0.6
+bxy &lt;- 0.0
+bux &lt;- 0.1
+buy &lt;- 0.1
+rho &lt;- 0.8
+dat &lt;- generate_individuals(n=1000000, maf=0.5, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 dat &lt;- match_spouses(dat, rho, &quot;xm&quot;, &quot;yf&quot;)
-dat &lt;- create_child(dat, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+dat &lt;- create_child(dat, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 
 
 # Within male
 cor(dat$ym, dat$xm)</code></pre>
-<pre><code>## [1] 0.4088617</code></pre>
+<pre><code>## [1] 0.0109015</code></pre>
 <pre class="r"><code>cor(dat$xm, dat$gxm)</code></pre>
-<pre><code>## [1] 0.3003469</code></pre>
+<pre><code>## [1] 0.01033354</code></pre>
 <pre class="r"><code>cor(dat$xm, dat$gym)</code></pre>
-<pre><code>## [1] -0.001316471</code></pre>
+<pre><code>## [1] 0.002129854</code></pre>
 <pre class="r"><code>cor(dat$ym, dat$gxm)</code></pre>
-<pre><code>## [1] 0.1188112</code></pre>
+<pre><code>## [1] 0.001936574</code></pre>
 <pre class="r"><code>cor(dat$ym, dat$gym)</code></pre>
-<pre><code>## [1] 0.2989902</code></pre>
+<pre><code>## [1] 0.6004178</code></pre>
 <pre class="r"><code># Within female
 cor(dat$yf, dat$xf)</code></pre>
-<pre><code>## [1] 0.4081048</code></pre>
+<pre><code>## [1] 0.009989478</code></pre>
 <pre class="r"><code>cor(dat$xf, dat$gxf)</code></pre>
-<pre><code>## [1] 0.2978323</code></pre>
+<pre><code>## [1] 0.01175026</code></pre>
 <pre class="r"><code>cor(dat$xf, dat$gyf)</code></pre>
-<pre><code>## [1] -0.002168839</code></pre>
+<pre><code>## [1] -0.0007436911</code></pre>
 <pre class="r"><code>cor(dat$yf, dat$gxf)</code></pre>
-<pre><code>## [1] 0.1178392</code></pre>
+<pre><code>## [1] -0.0009948188</code></pre>
 <pre class="r"><code>cor(dat$yf, dat$gyf)</code></pre>
-<pre><code>## [1] 0.2979653</code></pre>
+<pre><code>## [1] 0.6001147</code></pre>
 <pre class="r"><code># Cross spousal phen
 cor(dat$xm, dat$yf)</code></pre>
-<pre><code>## [1] 0.7996103</code></pre>
+<pre><code>## [1] 0.8000418</code></pre>
 <pre class="r"><code>cor(dat$xm, dat$xf)</code></pre>
-<pre><code>## [1] 0.3263918</code></pre>
+<pre><code>## [1] 0.007320727</code></pre>
 <pre class="r"><code>cor(dat$ym, dat$xf)</code></pre>
-<pre><code>## [1] 0.1330516</code></pre>
+<pre><code>## [1] 0.002044984</code></pre>
 <pre class="r"><code>cor(dat$ym, dat$yf)</code></pre>
-<pre><code>## [1] 0.3265556</code></pre>
+<pre><code>## [1] 0.007648951</code></pre>
 <pre class="r"><code># Cross spousal geno
 cor(dat$gxm, dat$gxf)</code></pre>
-<pre><code>## [1] 0.02579619</code></pre>
+<pre><code>## [1] -0.002489835</code></pre>
 <pre class="r"><code>cor(dat$gxm, dat$gyf)</code></pre>
-<pre><code>## [1] 0.07263341</code></pre>
+<pre><code>## [1] 0.005118303</code></pre>
 <pre class="r"><code>cor(dat$gym, dat$gxf)</code></pre>
-<pre><code>## [1] 0.0007346184</code></pre>
+<pre><code>## [1] 0.0004453665</code></pre>
 <pre class="r"><code>cor(dat$gym, dat$gyf)</code></pre>
-<pre><code>## [1] -0.0002678568</code></pre>
+<pre><code>## [1] 0.002218318</code></pre>
 <pre class="r"><code># Child
 cor(dat$gxo, dat$gyo)</code></pre>
-<pre><code>## [1] 0.01935537</code></pre>
+<pre><code>## [1] 0.001832161</code></pre>
 <pre class="r"><code>cor(dat$xo, dat$gyo)</code></pre>
-<pre><code>## [1] 0.005976707</code></pre>
+<pre><code>## [1] -0.0009679941</code></pre>
 <pre class="r"><code>cor(dat$xo, dat$gyo)</code></pre>
-<pre><code>## [1] 0.005976707</code></pre>
+<pre><code>## [1] -0.0009679941</code></pre>
 <pre class="r"><code>summary(lm(dat$gxo ~ dat$yo))</code></pre>
 <pre><code>## 
 ## Call:
@@ -517,18 +522,18 @@ cor(dat$gxo, dat$gyo)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.30313 -0.83816  0.00091  0.83266  1.30705 
+## -1.00609 -0.00414 -0.00095  0.00284  1.00440 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.9991440  0.0007079 1411.46   &lt;2e-16 ***
-## dat$yo      0.0685440  0.0007079   96.83   &lt;2e-16 ***
+##              Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) 1.0009540  0.0007062 1417.320   &lt;2e-16 ***
+## dat$yo      0.0011554  0.0007062    1.636    0.102    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7079 on 999998 degrees of freedom
-## Multiple R-squared:  0.009289,   Adjusted R-squared:  0.009288 
-## F-statistic:  9376 on 1 and 999998 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7062 on 999998 degrees of freedom
+## Multiple R-squared:  2.677e-06,  Adjusted R-squared:  1.677e-06 
+## F-statistic: 2.677 on 1 and 999998 DF,  p-value: 0.1018</code></pre>
 <pre class="r"><code>summary(lm(dat$gxm ~ dat$gym))</code></pre>
 <pre><code>## 
 ## Call:
@@ -536,18 +541,18 @@ cor(dat$gxo, dat$gyo)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -0.99993 -0.99963  0.00022  0.00037  1.00037 
+## -1.00159 -0.00159 -0.00005  0.00149  1.00149 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.9996259  0.0012248  816.15   &lt;2e-16 ***
-## dat$gym     0.0001501  0.0009999    0.15    0.881    
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.998511   0.001226 814.768   &lt;2e-16 ***
+## dat$gym     0.001541   0.001000   1.541    0.123    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7071 on 999998 degrees of freedom
-## Multiple R-squared:  2.253e-08,  Adjusted R-squared:  -9.775e-07 
-## F-statistic: 0.02253 on 1 and 999998 DF,  p-value: 0.8807</code></pre>
+## Residual standard error: 0.7069 on 999998 degrees of freedom
+## Multiple R-squared:  2.374e-06,  Adjusted R-squared:  1.374e-06 
+## F-statistic: 2.374 on 1 and 999998 DF,  p-value: 0.1233</code></pre>
 <pre class="r"><code>summary(lm(dat$gxm ~ dat$gyf))</code></pre>
 <pre><code>## 
 ## Call:
@@ -555,18 +560,18 @@ cor(dat$gxo, dat$gyo)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.07247 -0.92716  0.00018  0.07284  1.07284 
+## -1.00517 -0.00517 -0.00005  0.00507  1.00507 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.9271594  0.0012213  759.15   &lt;2e-16 ***
-## dat$gyf     0.0726576  0.0009977   72.83   &lt;2e-16 ***
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.994935   0.001225 812.371  &lt; 2e-16 ***
+## dat$gyf     0.005120   0.001000   5.118 3.08e-07 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7052 on 999998 degrees of freedom
-## Multiple R-squared:  0.005276,   Adjusted R-squared:  0.005275 
-## F-statistic:  5304 on 1 and 999998 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7069 on 999998 degrees of freedom
+## Multiple R-squared:  2.62e-05,   Adjusted R-squared:  2.52e-05 
+## F-statistic:  26.2 on 1 and 999998 DF,  p-value: 3.083e-07</code></pre>
 <pre class="r"><code>summary(lm(dat$gxm ~ dat$xf))</code></pre>
 <pre><code>## 
 ## Call:
@@ -574,18 +579,18 @@ cor(dat$gxo, dat$gyo)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.28595 -0.76577  0.00029  0.23379  1.30606 
+## -1.00049 -0.00037 -0.00005  0.00027  1.00035 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.9997760  0.0007038 1420.51   &lt;2e-16 ***
-## dat$xf      0.0678703  0.0007038   96.43   &lt;2e-16 ***
+##               Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept)  1.000e+00  7.069e-04 1414.690   &lt;2e-16 ***
+## dat$xf      -9.246e-05  7.069e-04   -0.131    0.896    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7038 on 999998 degrees of freedom
-## Multiple R-squared:  0.009213,   Adjusted R-squared:  0.009212 
-## F-statistic:  9299 on 1 and 999998 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7069 on 999998 degrees of freedom
+## Multiple R-squared:  1.711e-08,  Adjusted R-squared:  -9.829e-07 
+## F-statistic: 0.01711 on 1 and 999998 DF,  p-value: 0.8959</code></pre>
 <pre class="r"><code>summary(lm(dat$gxm ~ dat$uf))</code></pre>
 <pre><code>## 
 ## Call:
@@ -593,27 +598,27 @@ cor(dat$gxo, dat$gyo)</code></pre>
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.10031 -0.92192  0.00026  0.08035  1.10591 
+## -1.00158 -0.00117 -0.00005  0.00109  1.00168 
 ## 
 ## Coefficients:
-##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.9997847  0.0007067 1414.70   &lt;2e-16 ***
-## dat$uf      0.0228332  0.0007066   32.31   &lt;2e-16 ***
+##              Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) 1.0000541  0.0007069 1414.691   &lt;2e-16 ***
+## dat$uf      0.0003259  0.0007069    0.461    0.645    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.7067 on 999998 degrees of freedom
-## Multiple R-squared:  0.001043,   Adjusted R-squared:  0.001042 
-## F-statistic:  1044 on 1 and 999998 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Residual standard error: 0.7069 on 999998 degrees of freedom
+## Multiple R-squared:  2.126e-07,  Adjusted R-squared:  -7.874e-07 
+## F-statistic: 0.2126 on 1 and 999998 DF,  p-value: 0.6448</code></pre>
 <p>Expected covariance between gxm and gym</p>
 <p><span class="math display">\[
 cov(gxm, gym) = \rho cov(gxm, xm) cov(gyf, yf)
 \]</span></p>
 <p>Check:</p>
 <pre class="r"><code>with(dat, rho * cov(gxm, xm) * cov(gyf, yf))</code></pre>
-<pre><code>## [1] 0.0357826</code></pre>
+<pre><code>## [1] 0.002478448</code></pre>
 <pre class="r"><code>with(dat, cov(gxm, gyf))</code></pre>
-<pre><code>## [1] 0.03630191</code></pre>
+<pre><code>## [1] 0.002557009</code></pre>
 <p>Expected covariance between gxo and gyf</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -623,9 +628,9 @@ cov(gxo, gyf) &amp;= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \\
 \]</span></p>
 <p>Check:</p>
 <pre class="r"><code>with(dat, cov(gxo, gyf))</code></pre>
-<pre><code>## [1] 0.01783154</code></pre>
+<pre><code>## [1] 0.001460124</code></pre>
 <pre class="r"><code>with(dat, cov(gxm, gyf) * cov(gxm, gxo) * 2)</code></pre>
-<pre><code>## [1] 0.01857685</code></pre>
+<pre><code>## [1] 0.001273704</code></pre>
 <p>Expected covariance between gxo and gyo</p>
 <p><span class="math display">\[
 \begin{aligned}
@@ -636,11 +641,14 @@ cov(gxo, gyo) &amp;= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \cdot cov(gyf, gy
 \]</span></p>
 <p>Check:</p>
 <pre class="r"><code>cov(dat$gxo, dat$gyo)</code></pre>
-<pre><code>## [1] 0.009731057</code></pre>
+<pre><code>## [1] 0.0009153529</code></pre>
 <pre class="r"><code>4 * cov(dat$gxm, dat$gyf) * cov(dat$gxm, dat$gxo) * cov(dat$gyf, dat$gyo)</code></pre>
-<pre><code>## [1] 0.009264287</code></pre>
+<pre><code>## [1] 0.0006380879</code></pre>
 <pre class="r"><code>cov(dat$gxm, dat$gyf) / 4</code></pre>
-<pre><code>## [1] 0.009075477</code></pre>
+<pre><code>## [1] 0.0006392524</code></pre>
+<p>How does this translate to a causal effect estimate?</p>
+<pre class="r"><code>summary(lm(yo ~ gxo, dat))$coefficients[2,1] / summary(lm(xo ~ gxo, dat))$coefficients[2,1]</code></pre>
+<pre><code>## [1] 0.1782941</code></pre>
 <div id="other" class="section level2">
 <h2>Other</h2>
 <p>The child genotype is in HWE</p>
@@ -654,7 +662,7 @@ cov(gxo, gyo) &amp;= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \cdot cov(gyf, gy
 ##  Pearson&#39;s Chi-squared test
 ## 
 ## data:  rbind(table(dat$gxo), c(0.25 * nrow(dat), 0.5 * nrow(dat), 0.25 *     nrow(dat)))
-## X-squared = 67.771, df = 2, p-value = 1.922e-15</code></pre>
+## X-squared = 3.9788, df = 2, p-value = 0.1368</code></pre>
 </div>
 
 

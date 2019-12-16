@@ -117,10 +117,15 @@ create_child <- function(dat, bgx, bgy, bxy, bux, buy)
 Run the simulation:
 
 ```{r}
+bgx <- 0.01
+bgy <- 0.6
+bxy <- 0.0
+bux <- 0.1
+buy <- 0.1
 rho <- 0.8
-dat <- generate_individuals(n=1000000, maf=0.5, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+dat <- generate_individuals(n=1000000, maf=0.5, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 dat <- match_spouses(dat, rho, "xm", "yf")
-dat <- create_child(dat, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+dat <- create_child(dat, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 
 
 # Within male
@@ -213,6 +218,12 @@ Check:
 cov(dat$gxo, dat$gyo)
 4 * cov(dat$gxm, dat$gyf) * cov(dat$gxm, dat$gxo) * cov(dat$gyf, dat$gyo)
 cov(dat$gxm, dat$gyf) / 4
+```
+
+How does this translate to a causal effect estimate?
+
+```{r}
+summary(lm(yo ~ gxo, dat))$coefficients[2,1] / summary(lm(xo ~ gxo, dat))$coefficients[2,1]
 ```
 
 
