@@ -1,0 +1,232 @@
+---
+title: Assortative mating
+---
+
+```{r}
+suppressWarnings(suppressPackageStartupMessages({
+	library(simulateGP)
+	library(MASS)
+}))
+```
+
+What level of bias do we expect when performing MR on a population that has assortative mating, when the assortment correlation is known?
+
+
+
+Create parents without matching first, and just one SNP for now
+
+
+
+
+```{r}
+generate_individuals <- function(n, maf = 0.5, bgx = 0.5, bgy = 0.5, bxy = 0.3, bux=0.1, buy=0.1)
+{
+	nm <- n
+	nf <- n
+	gxm <- make_geno(nid=nm, nsnp=1, af=maf)
+	gym <- make_geno(nid=nm, nsnp=1, af=maf)
+	um <- rnorm(n)
+	xm <- make_phen(eff=c(bgx, bux), indep=cbind(gxm, um))
+	ym <- make_phen(eff=c(bxy, bgy, buy), indep=cbind(xm, gym, um))
+
+	gxf <- make_geno(nid=nf, nsnp=1, af=maf)
+	gyf <- make_geno(nid=nf, nsnp=1, af=maf)
+	uf <- rnorm(n)
+	xf <- make_phen(eff=c(bgx, bux), indep=cbind(gxf, uf))
+	yf <- make_phen(eff=c(bxy, bgy, buy), indep=cbind(xf, gyf, uf))
+
+	return(tibble(gxm, gxf, gym, gyf, xm, xf, ym, yf, um, uf))
+}
+```
+
+Match males and females to make assorted spouse pairs. Using a matching function that generates an ordering of males and females that induces a pre-specified correlation, `rho` between the phenotypes that are being assorted on:
+
+```{r}
+generate_rho <- function(m, f, rho)
+{
+	stopifnot(length(m) == length(f))
+	require(MASS)
+	mvdat <- mvrnorm(n = length(m), mu=c(0,0), Sigma=matrix(c(1,rho,rho,1), 2,2))
+	rm <- rank(mvdat[ , 1], ties.method = "first")
+	rf <- rank(mvdat[ , 2], ties.method = "first")
+	m_order <- order(m)
+	f_order <- order(f)
+	return(tibble(m = m_order[rm], f=f_order[rf]))
+}
+
+match_spouses <- function(dat, rho, matchm, matchf)
+{
+	matching <- generate_rho(dat[[matchm]], dat[[matchf]], rho)
+
+	dat$gxm <- dat$gxm[matching$m]
+	dat$gym <- dat$gym[matching$m]
+	dat$xm <- dat$xm[matching$m]
+	dat$ym <- dat$ym[matching$m]
+	dat$um <- dat$um[matching$m]
+
+	dat$gxf <- dat$gxf[matching$f]
+	dat$gyf <- dat$gyf[matching$f]
+	dat$xf <- dat$xf[matching$f]
+	dat$yf <- dat$yf[matching$f]
+	dat$uf <- dat$uf[matching$f]
+
+	return(dat)
+}
+
+```
+
+Create children
+
+```{r}
+generate_haplotypes <- function(g)
+{
+	h <- matrix(0,length(g),2)
+	h[g == 2,] <- 1
+	r <- sample(c(TRUE,FALSE), sum(g == 1), replace=TRUE)
+	h[g == 1,][r,1] <- 1
+	h[g == 1,][!r,2] <- 1
+	stopifnot(all(rowSums(h) == g))
+	return(h)
+}
+
+create_child_geno <- function(gm, gf)
+{
+	stopifnot(length(gm) == length(gf))
+	tr <- sample(c(TRUE,FALSE), length(gm), replace=TRUE)
+	ho <- matrix(0,length(gm), 2)
+	hm <- generate_haplotypes(gm)
+	hf <- generate_haplotypes(gf)
+	ho[tr,1] <- hm[tr,1]
+	ho[!tr,1] <- hm[!tr,2]
+	ho[tr,2] <- hf[tr,1]
+	ho[!tr,2] <- hf[!tr,2]
+	return(rowSums(ho))
+}
+
+create_child <- function(dat, bgx, bgy, bxy, bux, buy)
+{
+	dat$gxo <- create_child_geno(dat$gxm, dat$gxf)
+	dat$gyo <- create_child_geno(dat$gym, dat$gyf)
+	dat$uo <- rnorm(nrow(dat))
+	dat$xo <- make_phen(c(bgx, bux), cbind(dat$gxo, dat$uo))
+	dat$yo <- make_phen(c(bgx, bgy, buy), cbind(dat$xo, dat$gyo, dat$uo))
+	return(dat)
+}
+```
+
+Run the simulation:
+
+```{r}
+rho <- 0.8
+dat <- generate_individuals(n=1000000, maf=0.5, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+dat <- match_spouses(dat, rho, "xm", "yf")
+dat <- create_child(dat, bgx=0.3, bgy=0.3, bxy=0.4, bux=0.1, buy=0.1)
+
+
+# Within male
+cor(dat$ym, dat$xm)
+cor(dat$xm, dat$gxm)
+cor(dat$xm, dat$gym)
+cor(dat$ym, dat$gxm)
+cor(dat$ym, dat$gym)
+
+# Within female
+cor(dat$yf, dat$xf)
+cor(dat$xf, dat$gxf)
+cor(dat$xf, dat$gyf)
+cor(dat$yf, dat$gxf)
+cor(dat$yf, dat$gyf)
+
+
+# Cross spousal phen
+cor(dat$xm, dat$yf)
+cor(dat$xm, dat$xf)
+cor(dat$ym, dat$xf)
+cor(dat$ym, dat$yf)
+
+
+# Cross spousal geno
+cor(dat$gxm, dat$gxf)
+cor(dat$gxm, dat$gyf)
+cor(dat$gym, dat$gxf)
+cor(dat$gym, dat$gyf)
+
+# Child
+cor(dat$gxo, dat$gyo)
+cor(dat$xo, dat$gyo)
+cor(dat$xo, dat$gyo)
+
+summary(lm(dat$gxo ~ dat$yo))
+summary(lm(dat$gxm ~ dat$gym))
+summary(lm(dat$gxm ~ dat$gyf))
+summary(lm(dat$gxm ~ dat$xf))
+summary(lm(dat$gxm ~ dat$uf))
+
+
+```
+
+
+Expected covariance between gxm and gym
+
+$$
+cov(gxm, gym) = \rho cov(gxm, xm) cov(gyf, yf)
+$$
+
+Check:
+
+```{r}
+with(dat, rho * cov(gxm, xm) * cov(gyf, yf))
+with(dat, cov(gxm, gyf))
+```
+
+Expected covariance between gxo and gyf
+
+
+$$
+\begin{aligned}
+cov(gxo, gyf) &= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \\
+              &= 2 \cdot \rho \cdot cov(gxm, xm) \cdot cov(gyf, yf) \cdot cov(gxm, gxo)
+\end{aligned}
+$$
+
+Check:
+
+```{r}
+with(dat, cov(gxo, gyf))
+with(dat, cov(gxm, gyf) * cov(gxm, gxo) * 2)
+```
+
+
+Expected covariance between gxo and gyo
+
+$$
+\begin{aligned}
+cov(gxo, gyo) &= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \cdot cov(gyf, gyo) \\
+              &= 4 \cdot \rho \cdot cov(gxm, xm) \cdot cov(gyf, yf) \cdot cov(gxm, gxo) \cdot cov(gyf, gyo) \\
+              &= \frac{1}{4} \cdot \rho \cdot cov(gxm, xm) \cdot cov(gyf, yf)
+\end{aligned}
+$$
+
+Check:
+
+```{r}
+cov(dat$gxo, dat$gyo)
+4 * cov(dat$gxm, dat$gyf) * cov(dat$gxm, dat$gxo) * cov(dat$gyf, dat$gyo)
+cov(dat$gxm, dat$gyf) / 4
+```
+
+
+
+## Other
+
+The child genotype is in HWE
+
+```{r}
+chisq.test(
+	rbind(
+		table(dat$gxo), 
+		c(0.25*nrow(dat), 0.5*nrow(dat), 0.25 * nrow(dat))
+	)
+)
+```
+
