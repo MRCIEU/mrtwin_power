@@ -109,7 +109,7 @@ create_child <- function(dat, bgx, bgy, bxy, bux, buy)
 	dat$gyo <- create_child_geno(dat$gym, dat$gyf)
 	dat$uo <- rnorm(nrow(dat))
 	dat$xo <- make_phen(c(bgx, bux), cbind(dat$gxo, dat$uo))
-	dat$yo <- make_phen(c(bgx, bgy, buy), cbind(dat$xo, dat$gyo, dat$uo))
+	dat$yo <- make_phen(c(bxy, bgy, buy), cbind(dat$xo, dat$gyo, dat$uo))
 	return(dat)
 }
 ```
@@ -117,13 +117,14 @@ create_child <- function(dat, bgx, bgy, bxy, bux, buy)
 Run the simulation:
 
 ```{r}
-bgx <- 0.01
-bgy <- 0.6
+bgx <- 0.2
+bgy <- 0.8
 bxy <- 0.0
-bux <- 0.1
-buy <- 0.1
+bux <- 0
+buy <- 0
 rho <- 0.8
-dat <- generate_individuals(n=1000000, maf=0.5, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
+maf <- 0.2
+dat <- generate_individuals(n=1000000, maf=maf, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 dat <- match_spouses(dat, rho, "xm", "yf")
 dat <- create_child(dat, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy)
 
@@ -159,7 +160,7 @@ cor(dat$gym, dat$gyf)
 # Child
 cor(dat$gxo, dat$gyo)
 cor(dat$xo, dat$gyo)
-cor(dat$xo, dat$gyo)
+cor(dat$gxo, dat$yo)
 
 summary(lm(dat$gxo ~ dat$yo))
 summary(lm(dat$gxm ~ dat$gym))
@@ -171,17 +172,17 @@ summary(lm(dat$gxm ~ dat$uf))
 ```
 
 
-Expected covariance between gxm and gym
+Expected covariance between gxm and gyf
 
 $$
-cov(gxm, gym) = \rho cov(gxm, xm) cov(gyf, yf)
+cov(gxm, gyf) = \rho cov(gxm, xm) cov(gyf, yf)
 $$
 
 Check:
 
 ```{r}
-with(dat, rho * cov(gxm, xm) * cov(gyf, yf))
-with(dat, cov(gxm, gyf))
+rho * cov(dat$gxm, dat$xm) * cov(dat$gyf, dat$yf)
+cov(dat$gxm, dat$gyf)
 ```
 
 Expected covariance between gxo and gyf
@@ -189,16 +190,21 @@ Expected covariance between gxo and gyf
 
 $$
 \begin{aligned}
-cov(gxo, gyf) &= 2 \cdot cov(gxm, gyf) \cdot cov(gxm, gxo) \\
-              &= 2 \cdot \rho \cdot cov(gxm, xm) \cdot cov(gyf, yf) \cdot cov(gxm, gxo)
+cov(gxo, gyf) &= cov(gxm, gyf) \cdot cor(gxm, gxo) \\
+              &= \frac{1}{2} \cdot \rho \cdot cov(gxm, xm) \cdot cov(gyf, yf) \cdot cov(gxm, gxo)
 \end{aligned}
 $$
 
 Check:
 
 ```{r}
-with(dat, cov(gxo, gyf))
-with(dat, cov(gxm, gyf) * cov(gxm, gxo) * 2)
+cor(dat$gxo, dat$gyf)
+cor(dat$gxm, dat$gyf) * cor(dat$gxm, dat$gxo)
+
+cov(dat$gxo, dat$gyf)
+cov(dat$gxm, dat$gyf) * cor(dat$gxm, dat$gxo)
+cov(dat$gxm, dat$gyf) * 0.5
+rho * cov(dat$gxm, dat$xm) * cov(dat$gyf, dat$yf) * 0.5
 ```
 
 
@@ -216,8 +222,10 @@ Check:
 
 ```{r}
 cov(dat$gxo, dat$gyo)
-4 * cov(dat$gxm, dat$gyf) * cov(dat$gxm, dat$gxo) * cov(dat$gyf, dat$gyo)
+cov(dat$gxm, dat$gyf) * cor(dat$gxm, dat$gxo) * cor(dat$gyf, dat$gyo)
 cov(dat$gxm, dat$gyf) / 4
+with(dat, rho * cov(gxm, xm) * cov(gyf, yf)) / 4
+rho * cov(dat$gxm, dat$xm) * cov(dat$gyf, dat$yf) / 4
 ```
 
 How does this translate to a causal effect estimate?
@@ -226,6 +234,21 @@ How does this translate to a causal effect estimate?
 summary(lm(yo ~ gxo, dat))$coefficients[2,1] / summary(lm(xo ~ gxo, dat))$coefficients[2,1]
 ```
 
+
+Finally, what is the relationship between gxo and yo
+
+```{r}
+cov(dat$gxo, dat$yo)
+
+cov(dat$gxo, dat$gyo) / cor(dat$gyo, dat$yo)^2
+rho * cov(dat$gxm, dat$xm) * cov(dat$gyf, dat$yf) / (4 * cor(dat$gyo, dat$yo)^2)
+
+rho * cov(dat$gxm, dat$xm) * cov(dat$gyf, dat$yf) / (4 * cov(dat$gyo, dat$yo)^2 / (var(dat$yo) * var(dat$gyo)))
+
+rho * cov(dat$gxm, dat$xm) * (var(dat$yo) * var(dat$gyo) / (4 * cov(dat$gyo, dat$yo) ))
+
+
+```
 
 
 ## Other
@@ -239,5 +262,35 @@ chisq.test(
 		c(0.25*nrow(dat), 0.5*nrow(dat), 0.25 * nrow(dat))
 	)
 )
+```
+
+Check that the path through the causal effect doesn't influence the assortative mating bias term
+
+```{r}
+param <- expand.grid(
+	bgx = c(0.1),
+	bgy = c(0.6),
+	bxy = c(0, 0.1, 0.2),
+	bux = c(0.1),
+	buy = c(0.1),
+	rho = c(0.8),
+	sim = 1:10,
+	bxyhat = NA
+)
+rm(bgx,bgy,bxy,bux,buy,rho)
+
+for(i in 1:nrow(param))
+{
+	message(i, " of ", nrow(param))
+	dat <- with(param[i, ], generate_individuals(n=1000000, maf=0.5, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy))
+	dat <- with(param[i, ], match_spouses(dat, rho, "xm", "yf"))
+	dat <- with(param[i, ], create_child(dat, bgx=bgx, bgy=bgy, bxy=bxy, bux=bux, buy=buy))
+	param$bxyhat[i] <- summary(lm(yo ~ gxo, dat))$coefficients[2,1] / summary(lm(xo ~ gxo, dat))$coefficients[2,1]
+}
+
+cor(param$bxyhat, param$bxy)
+param %>% group_by(bxy) %>% summarise(bxyhat=mean(bxyhat))
+
+
 ```
 
