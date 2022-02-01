@@ -45,6 +45,7 @@ Family <- R6Class("Family", list(
   sib_fe = NA,
   trio = NA,
   summary = NA,
+  snpvar = NA,
 
   initialize = function(nsnp=100, nfam=10000, af=runif(100, 0.01, 0.99), bxy=0.1, vg=0.4, bux=0.1, buy=0.1, vu=1, vc=1, mux=0, muy=0, vex=1, vey=1, S=1, spouse_cor=0.8)
   {
@@ -220,6 +221,13 @@ Family <- R6Class("Family", list(
     self$fe_model(g1, g2, self$sib1_p$x, self$sib2_p$x)
     self$trio_model(g1, gm, gd, self$sib1_p$x)
     self$af=tibble(af=self$af, af1=self$calc_af(self$sib1_g), af2=self$calc_af(self$sib2_g), afd=self$calc_af(self$dads_g), afm=self$calc_af(self$mums_g))
+    self$snpvar = tibble(
+      af=self$af$af,
+      dadv=sapply(1:ncol(gd), function(i) var(gd[,i])),
+      mumv=sapply(1:ncol(gd), function(i) var(gm[,i])),
+      sib1v=sapply(1:ncol(gd), function(i) var(g1[,i])),
+      sib2v=sapply(1:ncol(gd), function(i) var(g2[,i]))
+    )
   },
 
   summarise = function()
